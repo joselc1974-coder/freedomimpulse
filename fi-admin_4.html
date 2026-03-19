@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreedomImpulse — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --azul: #0F172A; --azul-mid: #1E293B;
+  --naranja: #EA580C; --naranja-light: #FB923C;
+  --verde: #10B981; --rojo: #EF4444; --amarillo: #F59E0B; --azul-btn: #3B82F6;
+  --gris-fondo: #F1F5F9; --gris-borde: #E2E8F0;
+  --blanco: #FFFFFF; --texto: #0F172A; --texto-medio: #475569; --texto-suave: #94A3B8;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Nunito',sans-serif;background:var(--gris-fondo);color:var(--texto);min-height:100vh}
+
+/* ── LOGIN ── */
+#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--azul);background-image:radial-gradient(circle at 20% 50%,rgba(234,88,12,.13) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(234,88,12,.07) 0%,transparent 40%)}
+.login-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:40px 36px;width:100%;max-width:380px;backdrop-filter:blur(12px)}
+.login-logo{font-family:'Outfit',sans-serif;font-weight:900;font-size:1.15rem;letter-spacing:-.04em;color:#fff;margin-bottom:4px}
+.login-logo span{color:var(--naranja)}
+.login-sub{font-size:.78rem;color:rgba(255,255,255,.35);margin-bottom:32px}
+.lbl{font-family:'Outfit',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:8px;display:block}
+.linput{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:13px 16px;color:#fff;font-family:'Nunito',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s;margin-bottom:16px}
+.linput:focus{border-color:var(--naranja)}
+.linput::placeholder{color:rgba(255,255,255,.2)}
+.login-btn{width:100%;background:var(--naranja);color:#fff;border:none;border-radius:8px;padding:14px;font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:background .2s;letter-spacing:.03em}
+.login-btn:hover{background:#C2410C}
+.login-err{color:#FCA5A5;font-size:.8rem;margin-top:10px;text-align:center;display:none}
+
+/* ── LAYOUT ── */
+#admin-screen{display:none}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:230px;background:var(--azul);flex-shrink:0;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100}
+.sb-logo{padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,.06)}
+.sb-brand{font-family:'Outfit',sans-serif;font-weight:900;font-size:1rem;letter-spacing:-.04em;color:#fff}
+.sb-brand span{color:var(--naranja)}
+.sb-user-pill{margin-top:8px;display:flex;align-items:center;gap:8px}
+.sb-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:.7rem;font-weight:800;color:#fff;flex-shrink:0}
+.sb-user-info{overflow:hidden}
+.sb-user-name{font-size:.78rem;font-weight:600;color:rgba(255,255,255,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-user-role{font-size:.62rem;color:rgba(255,255,255,.3);letter-spacing:.04em;text-transform:uppercase}
+.sb-nav{padding:14px 10px;flex:1;overflow-y:auto}
+.nav-section{font-family:'Outfit',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.2);padding:10px 10px 6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:6px;font-size:.84rem;font-weight:600;color:rgba(255,255,255,.45);cursor:pointer;transition:all .15s;margin-bottom:2px;user-select:none}
+.nav-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.8)}
+.nav-item.active{background:rgba(234,88,12,.15);color:var(--naranja-light)}
+.nav-item svg{width:15px;height:15px;flex-shrink:0}
+.nav-item.disabled{opacity:.3;pointer-events:none}
+.sb-footer{padding:14px 10px;border-top:1px solid rgba(255,255,255,.06)}
+.logout-btn{display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;color:rgba(255,255,255,.3);font-family:'Nunito',sans-serif;font-size:.8rem;cursor:pointer;padding:8px 10px;border-radius:6px;transition:all .15s}
+.logout-btn:hover{color:rgba(255,255,255,.7);background:rgba(255,255,255,.05)}
+
+/* ── MAIN ── */
+.main{margin-left:230px;flex:1;padding:28px 28px;max-width:calc(100% - 230px)}
+.page-header{margin-bottom:24px;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.page-title{font-family:'Outfit',sans-serif;font-size:1.45rem;font-weight:800;letter-spacing:-.03em;color:var(--azul)}
+.page-sub{font-size:.8rem;color:var(--texto-suave);margin-top:2px}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-card{background:#fff;border-radius:10px;padding:18px 20px;border:1px solid var(--gris-borde)}
+.stat-lbl{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-suave);margin-bottom:7px}
+.stat-val{font-family:'Outfit',sans-serif;font-size:1.9rem;font-weight:900;letter-spacing:-.04em;line-height:1;color:var(--azul)}
+.stat-sub{font-size:.7rem;color:var(--texto-suave);margin-top:5px}
+.stat-card.orange .stat-val{color:var(--naranja)}
+.stat-card.green .stat-val{color:var(--verde)}
+
+/* TABLE */
+.table-wrap{background:#fff;border-radius:10px;border:1px solid var(--gris-borde);overflow:hidden}
+.tbl-head{padding:16px 20px;border-bottom:1px solid var(--gris-borde);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.tsearch{display:flex;align-items:center;gap:8px;background:var(--gris-fondo);border:1px solid var(--gris-borde);border-radius:6px;padding:7px 12px;flex:1;max-width:260px}
+.tsearch input{border:none;background:none;outline:none;font-family:'Nunito',sans-serif;font-size:.83rem;color:var(--texto);width:100%}
+.tsearch svg{width:13px;height:13px;color:var(--texto-suave);flex-shrink:0}
+.acts{display:flex;gap:7px;flex-wrap:wrap}
+.tbtn{display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border-radius:6px;font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;border:1px solid var(--gris-borde);background:#fff;color:var(--texto-medio);transition:all .15s}
+.tbtn:hover{background:var(--gris-fondo)}
+.tbtn.primary{background:var(--naranja);color:#fff;border-color:var(--naranja)}
+.tbtn.primary:hover{background:#C2410C}
+.tbtn.danger{color:var(--rojo);border-color:#FECACA}
+.tbtn.danger:hover{background:#FEF2F2}
+.tbtn svg{width:12px;height:12px}
+table{width:100%;border-collapse:collapse}
+thead th{padding:9px 14px;text-align:left;font-family:'Outfit',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-suave);background:var(--gris-fondo);border-bottom:1px solid var(--gris-borde);cursor:pointer;user-select:none;white-space:nowrap}
+thead th:hover{color:var(--azul)}
+tbody tr{border-bottom:1px solid var(--gris-borde);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:rgba(234,88,12,.03)}
+tbody td{padding:12px 14px;font-size:.82rem;color:var(--texto-medio);vertical-align:middle}
+.td-main{font-weight:700;color:var(--azul);font-size:.88rem}
+.td-sub{color:var(--texto-suave);font-size:.75rem;margin-top:1px}
+.badge{display:inline-block;padding:3px 8px;border-radius:99px;font-size:.68rem;font-weight:700;letter-spacing:.03em;white-space:nowrap}
+.badge-rol{background:#EFF6FF;color:#1D4ED8}
+.badge-sector{background:#F0FDF4;color:#15803D}
+.ub-owner{background:#FFF7ED;color:#C2410C}
+.ub-admin{background:#EFF6FF;color:#1D4ED8}
+.ub-viewer{background:#F0FDF4;color:#15803D}
+.ub-inactive{background:#F1F5F9;color:#94A3B8}
+.urg-dot{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:900;color:#fff}
+.u-high{background:var(--naranja)} .u-mid{background:var(--amarillo)} .u-low{background:var(--verde)}
+.tbl-footer{padding:10px 20px;border-top:1px solid var(--gris-borde);display:flex;align-items:center;justify-content:space-between;font-size:.76rem;color:var(--texto-suave)}
+.empty-cell{text-align:center;padding:48px 20px;color:var(--texto-suave);font-size:.85rem}
+
+/* SORT */
+.sort-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.sort-row label{font-size:.74rem;font-weight:600;color:var(--texto-suave)}
+.sel{border:1px solid var(--gris-borde);border-radius:6px;padding:7px 10px;font-family:'Nunito',sans-serif;font-size:.82rem;background:#fff;color:var(--texto);outline:none;cursor:pointer}
+
+/* CHARTS */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.chart-card{background:#fff;border-radius:10px;padding:20px;border:1px solid var(--gris-borde)}
+.chart-title{font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:700;color:var(--azul);margin-bottom:16px}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.bar-row:last-child{margin-bottom:0}
+.bar-lbl{font-size:.74rem;color:var(--texto-medio);min-width:130px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{flex:1;background:var(--gris-fondo);border-radius:99px;height:7px;overflow:hidden}
+.bar-fill{height:100%;border-radius:99px;background:var(--naranja);transition:width .6s cubic-bezier(.4,0,.2,1)}
+.bar-fill.blue{background:#3B82F6} .bar-fill.green{background:var(--verde)}
+.bar-cnt{font-size:.72rem;font-weight:700;color:var(--texto-suave);min-width:22px;text-align:right}
+.urg-display{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0}
+.urg-big{font-family:'Outfit',sans-serif;font-size:3.2rem;font-weight:900;letter-spacing:-.06em;color:var(--naranja);line-height:1}
+.urg-bar{width:100%;background:var(--gris-fondo);border-radius:99px;height:9px;overflow:hidden;margin-top:14px}
+.urg-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--verde),var(--amarillo),var(--naranja));transition:width .8s}
+
+/* ── MODAL GENÉRICO ── */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal-box{background:#fff;border-radius:12px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,.3)}
+.modal-box.sm{max-width:460px} .modal-box.md{max-width:560px} .modal-box.lg{max-width:700px}
+.mhead{padding:20px 22px 16px;border-bottom:1px solid var(--gris-borde);display:flex;align-items:center;justify-content:space-between}
+.mtitle{font-family:'Outfit',sans-serif;font-size:1rem;font-weight:800;color:var(--azul)}
+.mclose{background:none;border:none;cursor:pointer;color:var(--texto-suave);font-size:1.2rem;padding:2px 6px;border-radius:4px;transition:all .15s}
+.mclose:hover{background:var(--gris-fondo);color:var(--azul)}
+.mbody{padding:22px}
+.mfooter{padding:14px 22px;border-top:1px solid var(--gris-borde);display:flex;justify-content:flex-end;gap:8px}
+
+/* FORM */
+.form-group{margin-bottom:18px}
+.form-label{font-family:'Outfit',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--texto-suave);display:block;margin-bottom:7px}
+.form-input,.form-select{width:100%;border:1.5px solid var(--gris-borde);border-radius:8px;padding:11px 14px;font-family:'Nunito',sans-serif;font-size:.92rem;color:var(--texto);outline:none;transition:border-color .2s;background:#fff}
+.form-input:focus,.form-select:focus{border-color:var(--naranja)}
+.form-input::placeholder{color:var(--texto-suave)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-hint{font-size:.72rem;color:var(--texto-suave);margin-top:5px}
+.form-err{color:var(--rojo);font-size:.76rem;margin-top:6px;display:none}
+
+/* USER CARDS */
+.users-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:20px}
+.user-card{background:#fff;border-radius:10px;border:1px solid var(--gris-borde);padding:20px;transition:box-shadow .2s}
+.user-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.07)}
+.uc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.uc-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:800;color:#fff;flex-shrink:0}
+.uc-info{flex:1;padding:0 12px;min-width:0}
+.uc-name{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;color:var(--azul);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.uc-username{font-size:.75rem;color:var(--texto-suave);margin-top:1px}
+.uc-actions{display:flex;gap:4px}
+.uc-btn{background:none;border:none;cursor:pointer;padding:5px 7px;border-radius:5px;color:var(--texto-suave);transition:all .15s;font-size:.75rem}
+.uc-btn:hover{background:var(--gris-fondo);color:var(--azul)}
+.uc-btn.del:hover{background:#FEF2F2;color:var(--rojo)}
+.uc-perms{display:flex;flex-direction:column;gap:5px}
+.perm-row{display:flex;align-items:center;justify-content:space-between}
+.perm-label{font-size:.75rem;color:var(--texto-medio);font-weight:500}
+.perm-val{font-size:.72rem;font-weight:700}
+.perm-yes{color:var(--verde)} .perm-no{color:#CBD5E1}
+.uc-footer{margin-top:14px;padding-top:12px;border-top:1px solid var(--gris-borde);display:flex;align-items:center;justify-content:space-between}
+.uc-last{font-size:.7rem;color:var(--texto-suave)}
+.status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px}
+.dot-active{background:var(--verde)} .dot-inactive{background:#CBD5E1}
+
+/* ACTIVITY */
+.activity-list{display:flex;flex-direction:column;gap:0}
+.act-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--gris-borde)}
+.act-item:last-child{border-bottom:none}
+.act-icon{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.75rem}
+.act-body{flex:1;min-width:0}
+.act-text{font-size:.82rem;color:var(--texto-medio);line-height:1.4}
+.act-time{font-size:.7rem;color:var(--texto-suave);margin-top:2px}
+
+/* TOGGLE SWITCH */
+.toggle-wrap{display:flex;align-items:center;gap:10px}
+.toggle{position:relative;width:38px;height:20px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-slider{position:absolute;inset:0;background:#CBD5E1;border-radius:99px;cursor:pointer;transition:background .2s}
+.toggle-slider::before{content:'';position:absolute;width:14px;height:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .2s}
+.toggle input:checked+.toggle-slider{background:var(--verde)}
+.toggle input:checked+.toggle-slider::before{transform:translateX(18px)}
+.toggle-label{font-size:.82rem;color:var(--texto-medio);font-weight:500}
+
+/* CONFIRM DANGER */
+.danger-box{background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:14px 16px;margin-bottom:16px}
+.danger-box p{font-size:.85rem;color:#991B1B;line-height:1.5}
+.danger-box strong{font-weight:700}
+
+/* PERMISOS GRID */
+.perms-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.perm-check{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1.5px solid var(--gris-borde);border-radius:7px;cursor:pointer;transition:all .15s}
+.perm-check:hover{border-color:var(--naranja);background:rgba(234,88,12,.03)}
+.perm-check input{accent-color:var(--naranja);width:15px;height:15px;cursor:pointer}
+.perm-check span{font-size:.82rem;color:var(--texto-medio);font-weight:500}
+.perm-check.checked{border-color:var(--naranja);background:rgba(234,88,12,.04)}
+
+/* RESPONSIVE */
+@media(max-width:1100px){.stats-grid{grid-template-columns:repeat(2,1fr)}.charts-row{grid-template-columns:1fr}}
+@media(max-width:768px){.sidebar{display:none}.main{margin-left:0;max-width:100%;padding:18px 14px}}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Freedom<span>Impulse</span></div>
+    <p class="login-sub">Panel de administración</p>
+    <label class="lbl" for="li-user">Usuario</label>
+    <input type="text" id="li-user" class="linput" placeholder="tu-usuario" autocomplete="username">
+    <label class="lbl" for="li-pwd">Contraseña</label>
+    <input type="password" id="li-pwd" class="linput" placeholder="••••••••" autocomplete="current-password">
+    <button class="login-btn" onclick="doLogin()">Entrar →</button>
+    <p id="login-err" class="login-err">Usuario o contraseña incorrectos.</p>
+    <p style="text-align:center;margin-top:16px"><button onclick="openForgot()" style="background:none;border:none;color:rgba(255,255,255,.3);font-size:.78rem;cursor:pointer;font-family:'Nunito',sans-serif;transition:color .2s" onmouseover="this.style.color='rgba(255,255,255,.6)'" onmouseout="this.style.color='rgba(255,255,255,.3)'">¿Olvidaste tu contraseña?</button></p>
+  </div>
+</div>
+
+<!-- ── ADMIN ── -->
+<div id="admin-screen">
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sb-logo">
+        <div class="sb-brand">Freedom<span>Impulse</span></div>
+        <div class="sb-user-pill">
+          <div class="sb-avatar" id="sb-avatar" style="background:var(--naranja)">?</div>
+          <div class="sb-user-info">
+            <div class="sb-user-name" id="sb-username">—</div>
+            <div class="sb-user-role" id="sb-role-label">—</div>
+          </div>
+        </div>
+      </div>
+      <nav class="sb-nav">
+        <div class="nav-section">Principal</div>
+        <div class="nav-item active" id="ni-dashboard" onclick="showTab('dashboard')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard
+        </div>
+        <div class="nav-item" id="ni-leads" onclick="showTab('leads')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Leads
+        </div>
+        <div class="nav-item" id="ni-estadisticas" onclick="showTab('estadisticas')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Estadísticas
+        </div>
+        <div class="nav-section" id="nav-section-team">Equipo</div>
+        <div class="nav-item" id="ni-usuarios" onclick="showTab('usuarios')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20v-1a8 8 0 0 1 16 0v1"/></svg>Usuarios
+        </div>
+        <div class="nav-item" id="ni-actividad" onclick="showTab('actividad')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Actividad
+        </div>
+      </nav>
+      <div class="sb-footer">
+        <button class="logout-btn" onclick="doLogout()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Cerrar sesión
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- DASHBOARD -->
+      <div id="tab-dashboard">
+        <div class="page-header">
+          <div><h1 class="page-title">Dashboard</h1><p class="page-sub" id="dash-sub">—</p></div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card orange"><div class="stat-lbl">Total leads</div><div class="stat-val" id="st-total">0</div><div class="stat-sub">Formularios completados</div></div>
+          <div class="stat-card"><div class="stat-lbl">Urgencia media</div><div class="stat-val" id="st-urg">—</div><div class="stat-sub">Escala 1-10</div></div>
+          <div class="stat-card green"><div class="stat-lbl">Alta urgencia (8-10)</div><div class="stat-val" id="st-alta">0</div><div class="stat-sub">Leads prioritarios</div></div>
+          <div class="stat-card"><div class="stat-lbl">Usuarios activos</div><div class="stat-val" id="st-users">0</div><div class="stat-sub">Con acceso al panel</div></div>
+        </div>
+        <div class="table-wrap">
+          <div class="tbl-head"><span style="font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;color:var(--azul);">Últimos 5 leads</span><button class="tbtn" onclick="showTab('leads')">Ver todos →</button></div>
+          <table><thead><tr><th>Empresa</th><th>Rol</th><th>Sector</th><th>Urgencia</th><th>Fecha</th></tr></thead>
+          <tbody id="dash-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <!-- LEADS -->
+      <div id="tab-leads" style="display:none;">
+        <div class="page-header">
+          <div><h1 class="page-title">Leads</h1><p class="page-sub">Todos los formularios completados</p></div>
+          <div class="acts" id="leads-acts"></div>
+        </div>
+        <div class="sort-row">
+          <label>Ordenar:</label>
+          <select class="sel" id="sort-by" onchange="renderLeads()">
+            <option value="fecha-desc">Más recientes</option><option value="fecha-asc">Más antiguos</option>
+            <option value="urgencia-desc">Mayor urgencia</option><option value="urgencia-asc">Menor urgencia</option>
+            <option value="empresa-asc">Empresa A→Z</option>
+          </select>
+          <label>Urgencia:</label>
+          <select class="sel" id="f-urg" onchange="renderLeads()"><option value="">Todas</option><option value="alta">Alta (8-10)</option><option value="media">Media (5-7)</option><option value="baja">Baja (1-4)</option></select>
+          <label>Sector:</label>
+          <select class="sel" id="f-sector" onchange="renderLeads()"><option value="">Todos</option></select>
+        </div>
+        <div class="table-wrap">
+          <div class="tbl-head">
+            <div class="tsearch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="search-in" placeholder="Buscar empresa, sector, ciudad…" oninput="renderLeads()"></div>
+            <span id="leads-cnt" style="font-size:.76rem;color:var(--texto-suave)"></span>
+          </div>
+          <div style="overflow-x:auto"><table><thead><tr><th>Empresa</th><th>Rol</th><th>Sector</th><th>Empleados</th><th>Urgencia</th><th>Fecha</th><th></th></tr></thead><tbody id="leads-tbody"></tbody></table></div>
+          <div class="tbl-footer" id="leads-foot"></div>
+        </div>
+      </div>
+
+      <!-- ESTADÍSTICAS -->
+      <div id="tab-estadisticas" style="display:none;">
+        <div class="page-header"><div><h1 class="page-title">Estadísticas</h1><p class="page-sub">Distribución de respuestas</p></div></div>
+        <div class="charts-row" style="grid-template-columns:1fr 1fr 1fr">
+          <div class="chart-card"><div class="chart-title">Por rol</div><div id="ch-rol"></div></div>
+          <div class="chart-card"><div class="chart-title">Por sector</div><div id="ch-sector"></div></div>
+          <div class="chart-card"><div class="chart-title">Por tamaño</div><div id="ch-emp"></div></div>
+        </div>
+        <div class="charts-row">
+          <div class="chart-card"><div class="chart-title">Situaciones más comunes</div><div id="ch-sit"></div></div>
+          <div class="chart-card"><div class="chart-title">Urgencia media</div><div class="urg-display"><div class="urg-big" id="urg-num">—</div><div style="font-size:.75rem;color:var(--texto-suave);margin-top:4px">Promedio (escala 1-10)</div><div class="urg-bar"><div class="urg-fill" id="urg-fill" style="width:0%"></div></div></div></div>
+        </div>
+        <div class="charts-row">
+          <div class="chart-card"><div class="chart-title">Inversiones previas</div><div id="ch-inv"></div></div>
+          <div class="chart-card"><div class="chart-title">Distribución urgencia</div><div id="ch-urg-dist"></div></div>
+        </div>
+      </div>
+
+      <!-- USUARIOS -->
+      <div id="tab-usuarios" style="display:none;">
+        <div class="page-header">
+          <div><h1 class="page-title">Gestión de usuarios</h1><p class="page-sub">Altas, bajas y permisos del equipo</p></div>
+          <button class="tbtn primary" id="btn-new-user" onclick="openUserModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nuevo usuario
+          </button>
+        </div>
+        <div id="users-grid" class="users-grid"></div>
+      </div>
+
+      <!-- ACTIVIDAD -->
+      <div id="tab-actividad" style="display:none;">
+        <div class="page-header"><div><h1 class="page-title">Registro de actividad</h1><p class="page-sub">Últimas acciones en el panel</p></div>
+        <button class="tbtn danger" onclick="clearActivity()">Limpiar registro</button></div>
+        <div class="table-wrap"><div class="mbody"><div class="activity-list" id="act-list"></div></div></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- MODAL LEAD DETALLE -->
+<div class="modal-overlay" id="modal-lead">
+  <div class="modal-box md">
+    <div class="mhead"><div class="mtitle" id="ml-title">—</div><button class="mclose" onclick="closeModal('modal-lead')">✕</button></div>
+    <div class="mbody" id="ml-body"></div>
+  </div>
+</div>
+
+<!-- MODAL USUARIO (crear/editar) -->
+<div class="modal-overlay" id="modal-user">
+  <div class="modal-box sm">
+    <div class="mhead"><div class="mtitle" id="mu-title">Nuevo usuario</div><button class="mclose" onclick="closeModal('modal-user')">✕</button></div>
+    <div class="mbody">
+      <input type="hidden" id="mu-id">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nombre completo</label>
+          <input type="text" id="mu-name" class="form-input" placeholder="Ej: Carlos López">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Usuario (login)</label>
+          <input type="text" id="mu-username" class="form-input" placeholder="carlos.lopez" autocomplete="off">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Contraseña</label>
+          <input type="text" id="mu-pwd" class="form-input" placeholder="Mín. 6 caracteres" autocomplete="off">
+          <p class="form-hint" id="mu-pwd-hint">Dejar vacío para no cambiar</p>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Rol</label>
+          <select id="mu-rol" class="form-select" onchange="updatePermsByRole()">
+            <option value="admin">Administrador</option>
+            <option value="viewer">Solo lectura</option>
+            <option value="manager">Gestor de leads</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Permisos específicos</label>
+        <div class="perms-grid" id="perms-grid">
+          <label class="perm-check" id="pc-dashboard"><input type="checkbox" id="p-dashboard" value="dashboard"><span>📊 Ver dashboard</span></label>
+          <label class="perm-check" id="pc-leads"><input type="checkbox" id="p-leads" value="leads"><span>👥 Ver leads</span></label>
+          <label class="perm-check" id="pc-delete-leads"><input type="checkbox" id="p-delete-leads" value="delete_leads"><span>🗑️ Eliminar leads</span></label>
+          <label class="perm-check" id="pc-export"><input type="checkbox" id="p-export" value="export"><span>📥 Exportar CSV</span></label>
+          <label class="perm-check" id="pc-stats"><input type="checkbox" id="p-stats" value="stats"><span>📈 Ver estadísticas</span></label>
+          <label class="perm-check" id="pc-users"><input type="checkbox" id="p-users" value="users"><span>⚙️ Gestionar usuarios</span></label>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="toggle-wrap">
+          <label class="toggle"><input type="checkbox" id="mu-active" checked><div class="toggle-slider"></div></label>
+          <span class="toggle-label">Cuenta activa</span>
+        </div>
+      </div>
+      <p id="mu-err" class="form-err">Completa todos los campos requeridos.</p>
+    </div>
+    <div class="mfooter">
+      <button class="tbtn" onclick="closeModal('modal-user')">Cancelar</button>
+      <button class="tbtn primary" onclick="saveUser()">Guardar usuario</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CAMBIAR CONTRASEÑA -->
+<div class="modal-overlay" id="modal-pwd">
+  <div class="modal-box sm">
+    <div class="mhead"><div class="mtitle">Cambiar contraseña</div><button class="mclose" onclick="closeModal('modal-pwd')">✕</button></div>
+    <div class="mbody">
+      <div class="form-group"><label class="form-label">Contraseña actual</label><input type="password" id="pwd-old" class="form-input" placeholder="••••••••" autocomplete="current-password"></div>
+      <div class="form-group"><label class="form-label">Nueva contraseña</label><input type="password" id="pwd-new" class="form-input" placeholder="Mín. 6 caracteres" autocomplete="new-password"></div>
+      <div class="form-group"><label class="form-label">Confirmar nueva contraseña</label><input type="password" id="pwd-confirm" class="form-input" placeholder="Repite la nueva contraseña" autocomplete="new-password"></div>
+      <p id="pwd-err" class="form-err">—</p>
+      <p id="pwd-ok" style="display:none;color:var(--verde);font-size:.8rem;margin-top:6px;font-weight:600;">✅ Contraseña cambiada correctamente.</p>
+    </div>
+    <div class="mfooter">
+      <button class="tbtn" onclick="closeModal('modal-pwd')">Cancelar</button>
+      <button class="tbtn primary" onclick="changePassword()">Guardar contraseña</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL RESETEAR CONTRASEÑA (owner resetea a otro usuario) -->
+<div class="modal-overlay" id="modal-reset-pwd">
+  <div class="modal-box sm">
+    <div class="mhead"><div class="mtitle">Resetear contraseña</div><button class="mclose" onclick="closeModal('modal-reset-pwd')">✕</button></div>
+    <div class="mbody">
+      <p style="font-size:.88rem;color:var(--texto-medio);margin-bottom:20px;line-height:1.6;">Establece una contraseña nueva para <strong id="reset-user-name">este usuario</strong>. Se la tendrás que comunicar tú directamente.</p>
+      <div class="form-group"><label class="form-label">Nueva contraseña</label><input type="password" id="reset-pwd-new" class="form-input" placeholder="Mín. 6 caracteres" autocomplete="new-password"></div>
+      <div class="form-group"><label class="form-label">Confirmar contraseña</label><input type="password" id="reset-pwd-confirm" class="form-input" placeholder="Repite la contraseña" autocomplete="new-password"></div>
+      <p id="reset-pwd-err" class="form-err">—</p>
+      <p id="reset-pwd-ok" style="display:none;color:var(--verde);font-size:.8rem;margin-top:6px;font-weight:600;">✅ Contraseña actualizada correctamente.</p>
+    </div>
+    <div class="mfooter">
+      <button class="tbtn" onclick="closeModal('modal-reset-pwd')">Cancelar</button>
+      <button class="tbtn primary" onclick="resetPassword()">Establecer contraseña</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL OLVIDÉ MI CONTRASEÑA (pantalla de login) -->
+<div class="modal-overlay" id="modal-forgot">
+  <div class="modal-box sm">
+    <div class="mhead"><div class="mtitle">¿Olvidaste tu contraseña?</div><button class="mclose" onclick="closeModal('modal-forgot')">✕</button></div>
+    <div class="mbody">
+      <p style="font-size:.88rem;color:var(--texto-medio);margin-bottom:20px;line-height:1.65;">Si eres el <strong>propietario</strong>, introduce tu usuario y la contraseña de emergencia para acceder y restablecerla desde el panel.<br><br>Si eres un miembro del equipo, contacta con el propietario para que te resetee la contraseña.</p>
+      <div class="form-group">
+        <label class="form-label">Usuario</label>
+        <input type="text" id="forgot-user" class="form-input" placeholder="tu-usuario" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contraseña de emergencia</label>
+        <input type="password" id="forgot-emergency" class="form-input" placeholder="••••••••" autocomplete="current-password">
+        <p class="form-hint" style="margin-top:6px">La contraseña de emergencia es: <strong id="emergency-hint" style="color:var(--naranja)">—</strong></p>
+      </div>
+      <p id="forgot-err" class="form-err">—</p>
+    </div>
+    <div class="mfooter">
+      <button class="tbtn" onclick="closeModal('modal-forgot')">Cancelar</button>
+      <button class="tbtn primary" onclick="doForgotLogin()">Acceder →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR ELIMINAR USUARIO -->
+<div class="modal-overlay" id="modal-del-user">
+  <div class="modal-box sm">
+    <div class="mhead"><div class="mtitle">Eliminar usuario</div><button class="mclose" onclick="closeModal('modal-del-user')">✕</button></div>
+    <div class="mbody">
+      <div class="danger-box"><p>¿Estás seguro de que quieres eliminar a <strong id="del-user-name">este usuario</strong>? Esta acción no se puede deshacer.</p></div>
+    </div>
+    <div class="mfooter">
+      <button class="tbtn" onclick="closeModal('modal-del-user')">Cancelar</button>
+      <button class="tbtn danger" onclick="confirmDeleteUser()">Sí, eliminar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════
+// STORAGE KEYS
+// ════════════════════════════════════════════
+const SK_RESPONSES = 'fi_responses';
+const SK_USERS     = 'fi_users';
+const SK_ACTIVITY  = 'fi_activity';
+const SK_SESSION   = 'fi_session';
+
+// ════════════════════════════════════════════
+// USUARIOS — SISTEMA
+// ════════════════════════════════════════════
+function getUsers() { try { return JSON.parse(localStorage.getItem(SK_USERS) || '[]'); } catch { return []; } }
+function saveUsers(u) { localStorage.setItem(SK_USERS, JSON.stringify(u)); }
+
+// Crear owner por defecto si no existe
+(function initUsers() {
+  const users = getUsers();
+  if (!users.find(u => u.role === 'owner')) {
+    users.push({
+      id: 'owner-1', name: 'Propietario', username: 'admin',
+      password: 'FreedomAdmin2025', role: 'owner',
+      permissions: ['dashboard','leads','delete_leads','export','stats','users'],
+      active: true, created: new Date().toISOString(), lastLogin: null
+    });
+    saveUsers(users);
+  }
+})();
+
+// ════════════════════════════════════════════
+// SESSION
+// ════════════════════════════════════════════
+let currentUser = null;
+
+function getSession() {
+  try { return JSON.parse(sessionStorage.getItem(SK_SESSION)); } catch { return null; }
+}
+function setSession(user) {
+  sessionStorage.setItem(SK_SESSION, JSON.stringify({ id: user.id }));
+}
+
+// ════════════════════════════════════════════
+// LOGIN / LOGOUT
+// ════════════════════════════════════════════
+function doLogin() {
+  const uname = document.getElementById('li-user').value.trim();
+  const pwd   = document.getElementById('li-pwd').value;
+  const users = getUsers();
+  const user  = users.find(u => u.username === uname && u.password === pwd && u.active !== false);
+  if (!user) { document.getElementById('login-err').style.display = 'block'; return; }
+  // Update lastLogin
+  user.lastLogin = new Date().toISOString();
+  saveUsers(users);
+  currentUser = user;
+  setSession(user);
+  logActivity('login', `Inicio de sesión: ${user.name}`, user.id);
+  bootAdmin(user);
+}
+
+function doLogout() {
+  logActivity('logout', `Cierre de sesión: ${currentUser?.name}`, currentUser?.id);
+  sessionStorage.removeItem(SK_SESSION);
+  currentUser = null;
+  document.getElementById('admin-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('li-user').value = '';
+  document.getElementById('li-pwd').value = '';
+  document.getElementById('login-err').style.display = 'none';
+}
+
+document.getElementById('li-pwd').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+// Auto-login si hay sesión activa
+window.addEventListener('load', () => {
+  const sess = getSession();
+  if (sess) {
+    const user = getUsers().find(u => u.id === sess.id && u.active !== false);
+    if (user) { currentUser = user; bootAdmin(user); }
+  }
+});
+
+// ════════════════════════════════════════════
+// BOOT ADMIN
+// ════════════════════════════════════════════
+function bootAdmin(user) {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('admin-screen').style.display = 'block';
+
+  // Sidebar user info
+  document.getElementById('sb-username').textContent = user.name;
+  document.getElementById('sb-role-label').textContent = roleLabel(user.role);
+  document.getElementById('sb-avatar').textContent = user.name.charAt(0).toUpperCase();
+  document.getElementById('sb-avatar').style.background = avatarColor(user.name);
+
+  // Ocultar tabs sin permiso
+  applyNavPermissions(user);
+  populateSectorFilter();
+  renderDashboard();
+}
+
+function applyNavPermissions(user) {
+  const isOwner = user.role === 'owner';
+  const perms = user.permissions || [];
+  const has = p => isOwner || perms.includes(p);
+
+  document.getElementById('ni-leads').classList.toggle('disabled', !has('leads'));
+  document.getElementById('ni-estadisticas').classList.toggle('disabled', !has('stats'));
+  document.getElementById('ni-usuarios').classList.toggle('disabled', !has('users'));
+  document.getElementById('ni-actividad').classList.toggle('disabled', !has('users'));
+  if (!has('users')) {
+    document.getElementById('nav-section-team').style.opacity = '0.3';
+  }
+
+  // Botones de acción en leads
+  const isOwnerOrAdmin = isOwner || user.role === 'admin' || user.role === 'manager';
+  document.getElementById('leads-acts').innerHTML = `
+    ${has('export') ? '<button class="tbtn" onclick="exportCSV()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Exportar CSV</button>' : ''}
+    ${(isOwner || has('delete_leads')) ? '<button class="tbtn danger" onclick="clearAll()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>Borrar todo</button>' : ''}`;
+}
+
+// ════════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════════
+function showTab(name) {
+  ['dashboard','leads','estadisticas','usuarios','actividad'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t===name ? 'block' : 'none';
+    const ni = document.getElementById('ni-'+t);
+    if(ni) ni.classList.toggle('active', t===name);
+  });
+  if(name==='leads') renderLeads();
+  if(name==='estadisticas') renderStats();
+  if(name==='usuarios') renderUsers();
+  if(name==='actividad') renderActivity();
+}
+
+// ════════════════════════════════════════════
+// DATA HELPERS
+// ════════════════════════════════════════════
+function getData() { try { return JSON.parse(localStorage.getItem(SK_RESPONSES)||'[]'); } catch { return []; } }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function short(s,n) { return s&&s.length>n ? s.slice(0,n)+'…':s; }
+function fmtDate(iso) {
+  if(!iso) return '—';
+  const d=new Date(iso);
+  return d.toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'})+' '+d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+}
+function fmtDateShort(iso) {
+  if(!iso) return '—'; const d=new Date(iso);
+  return d.toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'2-digit'});
+}
+function urgClass(u) { u=parseInt(u||0); return u>=8?'u-high':u>=5?'u-mid':'u-low'; }
+
+// ════════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════════
+function renderDashboard() {
+  const data = getData();
+  document.getElementById('st-total').textContent = data.length;
+  const urgs = data.map(d=>parseInt(d.urgencia||0)).filter(Boolean);
+  const avg = urgs.length ? (urgs.reduce((a,b)=>a+b,0)/urgs.length).toFixed(1) : '—';
+  document.getElementById('st-urg').textContent = avg;
+  document.getElementById('st-alta').textContent = urgs.filter(u=>u>=8).length;
+  document.getElementById('st-users').textContent = getUsers().filter(u=>u.active!==false).length;
+  if(data.length) {
+    const last = [...data].sort((a,b)=>b.id-a.id)[0];
+    document.getElementById('dash-sub').textContent = 'Último lead: '+fmtDate(last.fecha);
+  }
+  const recent = [...data].sort((a,b)=>b.id-a.id).slice(0,5);
+  document.getElementById('dash-tbody').innerHTML = recent.length
+    ? recent.map(r=>`<tr><td><div class="td-main">${esc(r.empresa||'—')}</div><div class="td-sub">${esc(r.ciudad||'')}</div></td><td><span class="badge badge-rol">${esc(short(r.rol||'—',22))}</span></td><td><span class="badge badge-sector">${esc(short(r.sector||'—',18))}</span></td><td><span class="urg-dot ${urgClass(r.urgencia)}">${r.urgencia||'—'}</span></td><td style="font-size:.76rem;color:var(--texto-suave);white-space:nowrap">${fmtDateShort(r.fecha)}</td></tr>`).join('')
+    : '<tr><td colspan="5" class="empty-cell">Sin leads aún.</td></tr>';
+}
+
+// ════════════════════════════════════════════
+// LEADS
+// ════════════════════════════════════════════
+function populateSectorFilter() {
+  const data = getData();
+  const sectors = [...new Set(data.map(d=>d.sector).filter(Boolean))];
+  const sel = document.getElementById('f-sector');
+  sel.innerHTML = '<option value="">Todos</option>' + sectors.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('');
+}
+function renderLeads() {
+  let data = getData();
+  const search = document.getElementById('search-in').value.toLowerCase();
+  const sortBy = document.getElementById('sort-by').value;
+  const fUrg = document.getElementById('f-urg').value;
+  const fSec = document.getElementById('f-sector').value;
+  if(search) data = data.filter(d=>[d.empresa,d.ciudad,d.sector,d.rol,d.situacion].join(' ').toLowerCase().includes(search));
+  if(fUrg==='alta') data=data.filter(d=>parseInt(d.urgencia)>=8);
+  if(fUrg==='media') data=data.filter(d=>parseInt(d.urgencia)>=5&&parseInt(d.urgencia)<=7);
+  if(fUrg==='baja') data=data.filter(d=>parseInt(d.urgencia)<=4);
+  if(fSec) data=data.filter(d=>d.sector===fSec);
+  data.sort((a,b)=>{
+    if(sortBy==='fecha-desc') return b.id-a.id;
+    if(sortBy==='fecha-asc') return a.id-b.id;
+    if(sortBy==='urgencia-desc') return parseInt(b.urgencia||0)-parseInt(a.urgencia||0);
+    if(sortBy==='urgencia-asc') return parseInt(a.urgencia||0)-parseInt(b.urgencia||0);
+    if(sortBy==='empresa-asc') return (a.empresa||'').localeCompare(b.empresa||'');
+    return 0;
+  });
+  const canDelete = currentUser?.role==='owner' || (currentUser?.permissions||[]).includes('delete_leads');
+  document.getElementById('leads-cnt').textContent = data.length+' leads';
+  document.getElementById('leads-tbody').innerHTML = data.length
+    ? data.map(r=>`<tr><td><div class="td-main">${esc(r.empresa||'—')}</div><div class="td-sub">${esc(r.ciudad||'')}</div></td><td><span class="badge badge-rol">${esc(short(r.rol||'—',24))}</span></td><td><span class="badge badge-sector">${esc(short(r.sector||'—',20))}</span></td><td style="font-size:.8rem">${esc(r.empleados||'—')}</td><td><span class="urg-dot ${urgClass(r.urgencia)}">${r.urgencia||'—'}</span></td><td style="font-size:.75rem;color:var(--texto-suave);white-space:nowrap">${fmtDateShort(r.fecha)}</td><td style="display:flex;gap:4px"><button class="tbtn" style="padding:5px 10px;font-size:.72rem" onclick="openLead(${r.id})">Ver →</button>${canDelete?`<button class="tbtn danger" style="padding:5px 8px" onclick="deleteLead(${r.id})"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>`:''}</td></tr>`).join('')
+    : '<tr><td colspan="7" class="empty-cell">No se encontraron leads.</td></tr>';
+  document.getElementById('leads-foot').innerHTML = `<span>${data.length} resultado${data.length!==1?'s':''}</span>`;
+}
+
+function deleteLead(id) {
+  if(!confirm('¿Eliminar este lead?')) return;
+  const data = getData().filter(d=>d.id!==id);
+  localStorage.setItem(SK_RESPONSES, JSON.stringify(data));
+  logActivity('delete_lead', `Lead eliminado (id: ${id})`, currentUser?.id);
+  renderLeads(); renderDashboard(); populateSectorFilter();
+}
+function clearAll() {
+  if(!confirm('¿Borrar TODOS los leads? No se puede deshacer.')) return;
+  localStorage.removeItem(SK_RESPONSES);
+  logActivity('clear_leads', 'Todos los leads eliminados', currentUser?.id);
+  renderLeads(); renderDashboard();
+}
+function openLead(id) {
+  const r = getData().find(d=>d.id===id); if(!r) return;
+  document.getElementById('ml-title').textContent = r.empresa||'Lead';
+  document.getElementById('ml-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+      ${field('Empresa',r.empresa)}${field('Ciudad / País',r.ciudad)}
+      ${field('Rol',r.rol)}${field('Sector',r.sector)}
+      ${field('Empleados',r.empleados)}${field('Urgencia',(r.urgencia||'—')+' / 10')}
+      ${field('Fecha',fmtDate(r.fecha),'col2')}
+    </div>
+    <div style="border-top:1px solid var(--gris-borde);padding-top:16px">
+      <div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--texto-suave);margin-bottom:10px">Situación y contexto</div>
+      <div style="margin-bottom:12px">${field('Situación actual',r.situacion)}</div>
+      ${field('Inversiones previas',r.inversiones)}
+    </div>`;
+  document.getElementById('modal-lead').classList.add('open');
+}
+function field(label,val,cls=''){return `<div class="${cls}"><div style="font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-suave);margin-bottom:3px">${label}</div><div style="font-size:.88rem;font-weight:600;color:var(--texto);line-height:1.4">${esc(val||'—')}</div></div>`;}
+
+function exportCSV() {
+  const data = getData(); if(!data.length){alert('No hay datos.');return;}
+  const rows = data.map(r=>['empresa','ciudad','rol','sector','empleados','situacion','urgencia','inversiones','fecha'].map(k=>`"${(r[k]||'').replace(/"/g,'""')}"`).join(','));
+  const csv = ['Empresa,Ciudad,Rol,Sector,Empleados,Situación,Urgencia,Inversiones,Fecha',...rows].join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}));
+  a.download='fi-leads-'+new Date().toISOString().split('T')[0]+'.csv';a.click();
+  logActivity('export','CSV exportado',currentUser?.id);
+}
+
+// ════════════════════════════════════════════
+// ESTADÍSTICAS
+// ════════════════════════════════════════════
+function renderStats() {
+  const data = getData();
+  if(!data.length){['ch-rol','ch-sector','ch-emp','ch-sit','ch-inv','ch-urg-dist'].forEach(id=>document.getElementById(id).innerHTML='<p style="text-align:center;color:var(--texto-suave);font-size:.82rem;padding:20px 0">Sin datos aún.</p>');return;}
+  renderBarChart('ch-rol',countField(data,'rol'),'naranja');
+  renderBarChart('ch-sector',countField(data,'sector'),'blue');
+  renderBarChart('ch-emp',countField(data,'empleados'),'green');
+  const sitMap={};data.forEach(d=>(d.situacion||'').split(', ').forEach(s=>{s=s.trim();if(s)sitMap[s]=(sitMap[s]||0)+1;}));
+  renderBarChart('ch-sit',sitMap,'naranja');
+  const invMap={};data.forEach(d=>(d.inversiones||'').split(', ').forEach(s=>{s=s.trim();if(s&&s!=='Ninguna')invMap[s]=(invMap[s]||0)+1;}));
+  renderBarChart('ch-inv',invMap,'blue');
+  const urgs=data.map(d=>parseInt(d.urgencia||0)).filter(Boolean);
+  const avg=urgs.length?(urgs.reduce((a,b)=>a+b,0)/urgs.length).toFixed(1):0;
+  document.getElementById('urg-num').textContent=avg;
+  document.getElementById('urg-fill').style.width=(avg/10*100)+'%';
+  const ud={'1-3':0,'4-5':0,'6-7':0,'8-9':0,'10':0};
+  urgs.forEach(u=>{if(u<=3)ud['1-3']++;else if(u<=5)ud['4-5']++;else if(u<=7)ud['6-7']++;else if(u<=9)ud['8-9']++;else ud['10']++;});
+  renderBarChart('ch-urg-dist',ud,'naranja');
+}
+function countField(data,f){return data.reduce((a,d)=>{const v=d[f];if(v)a[v]=(a[v]||0)+1;return a},{});}
+function renderBarChart(id,map,color){
+  const el=document.getElementById(id);
+  const e=Object.entries(map).sort((a,b)=>b[1]-a[1]);const max=e.length?e[0][1]:1;
+  el.innerHTML=e.length?e.map(([l,c])=>`<div class="bar-row"><div class="bar-lbl" title="${esc(l)}">${esc(short(l,18))}</div><div class="bar-track"><div class="bar-fill ${color}" style="width:${Math.round(c/max*100)}%"></div></div><div class="bar-cnt">${c}</div></div>`).join(''):'<p style="color:var(--texto-suave);font-size:.82rem">Sin datos.</p>';
+}
+
+// ════════════════════════════════════════════
+// USUARIOS
+// ════════════════════════════════════════════
+const ROLE_PERMS = {
+  admin:   ['dashboard','leads','delete_leads','export','stats','users'],
+  viewer:  ['dashboard','leads','stats'],
+  manager: ['dashboard','leads','delete_leads','export','stats'],
+};
+function roleLabel(r){return{owner:'Propietario',admin:'Administrador',viewer:'Solo lectura',manager:'Gestor de leads'}[r]||r;}
+function avatarColor(name){const cols=['#EA580C','#3B82F6','#10B981','#8B5CF6','#F59E0B','#EF4444','#06B6D4'];let h=0;for(let i=0;i<name.length;i++)h=name.charCodeAt(i)+((h<<5)-h);return cols[Math.abs(h)%cols.length];}
+
+function renderUsers() {
+  const users = getUsers();
+  const isOwner = currentUser?.role==='owner';
+  const grid = document.getElementById('users-grid');
+  document.getElementById('btn-new-user').style.display = isOwner ? 'inline-flex' : 'none';
+
+  grid.innerHTML = users.map(u => {
+    const perms = u.role==='owner' ? ['dashboard','leads','delete_leads','export','stats','users'] : (u.permissions||[]);
+    const has = p => perms.includes(p);
+    const canEdit = isOwner && u.role!=='owner';
+    const canDel  = isOwner && u.role!=='owner';
+    return `<div class="user-card">
+      <div class="uc-top">
+        <div class="uc-avatar" style="background:${avatarColor(u.name)}">${u.name.charAt(0)}</div>
+        <div class="uc-info">
+          <div class="uc-name">${esc(u.name)}</div>
+          <div class="uc-username">@${esc(u.username)}</div>
+        </div>
+        <div class="uc-actions">
+          ${canEdit?`<button class="uc-btn" onclick="openUserModal('${u.id}')" title="Editar">✏️</button>`:''}
+          ${u.id===currentUser?.id?`<button class="uc-btn" onclick="openChangePwd()" title="Cambiar contraseña">🔑</button>`:''}
+          ${(isOwner && u.role!=='owner')?`<button class="uc-btn" onclick="openResetPwd('${u.id}','${esc(u.name)}')" title="Resetear contraseña">🔐</button>`:''}
+          ${canDel?`<button class="uc-btn del" onclick="askDeleteUser('${u.id}','${esc(u.name)}')" title="Eliminar">🗑️</button>`:''}
+        </div>
+      </div>
+      <div style="margin-bottom:10px;display:flex;align-items:center;gap:8px">
+        <span class="badge ub-${u.role}">${roleLabel(u.role)}</span>
+        <span style="display:flex;align-items:center;font-size:.72rem;color:var(--texto-suave)"><span class="status-dot ${u.active!==false?'dot-active':'dot-inactive'}"></span>${u.active!==false?'Activo':'Inactivo'}</span>
+      </div>
+      <div class="uc-perms">
+        <div class="perm-row"><span class="perm-label">📊 Dashboard</span><span class="perm-val ${has('dashboard')?'perm-yes':'perm-no'}">${has('dashboard')?'✓':'✕'}</span></div>
+        <div class="perm-row"><span class="perm-label">👥 Ver leads</span><span class="perm-val ${has('leads')?'perm-yes':'perm-no'}">${has('leads')?'✓':'✕'}</span></div>
+        <div class="perm-row"><span class="perm-label">🗑️ Eliminar leads</span><span class="perm-val ${has('delete_leads')?'perm-yes':'perm-no'}">${has('delete_leads')?'✓':'✕'}</span></div>
+        <div class="perm-row"><span class="perm-label">📥 Exportar CSV</span><span class="perm-val ${has('export')?'perm-yes':'perm-no'}">${has('export')?'✓':'✕'}</span></div>
+        <div class="perm-row"><span class="perm-label">📈 Estadísticas</span><span class="perm-val ${has('stats')?'perm-yes':'perm-no'}">${has('stats')?'✓':'✕'}</span></div>
+        <div class="perm-row"><span class="perm-label">⚙️ Gestionar usuarios</span><span class="perm-val ${has('users')?'perm-yes':'perm-no'}">${has('users')?'✓':'✕'}</span></div>
+      </div>
+      <div class="uc-footer">
+        <div class="uc-last">Último acceso: ${fmtDateShort(u.lastLogin)}</div>
+        <div class="uc-last">Creado: ${fmtDateShort(u.created)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+let editingUserId = null;
+function openUserModal(userId) {
+  editingUserId = userId || null;
+  const isEdit = !!userId;
+  document.getElementById('mu-title').textContent = isEdit ? 'Editar usuario' : 'Nuevo usuario';
+  document.getElementById('mu-pwd-hint').textContent = isEdit ? 'Dejar vacío para no cambiar' : '';
+  document.getElementById('mu-err').style.display = 'none';
+
+  if (isEdit) {
+    const u = getUsers().find(u=>u.id===userId); if(!u) return;
+    document.getElementById('mu-id').value = u.id;
+    document.getElementById('mu-name').value = u.name;
+    document.getElementById('mu-username').value = u.username;
+    document.getElementById('mu-pwd').value = '';
+    document.getElementById('mu-rol').value = u.role;
+    document.getElementById('mu-active').checked = u.active !== false;
+    const perms = u.permissions || [];
+    ['dashboard','leads','delete_leads','export','stats','users'].forEach(p => {
+      document.getElementById('p-'+p).checked = perms.includes(p);
+      document.getElementById('pc-'+p).classList.toggle('checked', perms.includes(p));
+    });
+  } else {
+    document.getElementById('mu-id').value = '';
+    document.getElementById('mu-name').value = '';
+    document.getElementById('mu-username').value = '';
+    document.getElementById('mu-pwd').value = '';
+    document.getElementById('mu-rol').value = 'viewer';
+    document.getElementById('mu-active').checked = true;
+    updatePermsByRole();
+  }
+  openModal('modal-user');
+}
+
+function updatePermsByRole() {
+  const role = document.getElementById('mu-rol').value;
+  const perms = ROLE_PERMS[role] || [];
+  ['dashboard','leads','delete_leads','export','stats','users'].forEach(p => {
+    const checked = perms.includes(p);
+    document.getElementById('p-'+p).checked = checked;
+    document.getElementById('pc-'+p).classList.toggle('checked', checked);
+  });
+}
+
+// Sync visual on checkbox click
+document.querySelectorAll('.perm-check input').forEach(cb => {
+  cb.addEventListener('change', function() {
+    this.closest('.perm-check').classList.toggle('checked', this.checked);
+  });
+});
+
+function saveUser() {
+  const name     = document.getElementById('mu-name').value.trim();
+  const username = document.getElementById('mu-username').value.trim().toLowerCase();
+  const pwd      = document.getElementById('mu-pwd').value;
+  const role     = document.getElementById('mu-rol').value;
+  const active   = document.getElementById('mu-active').checked;
+  const err      = document.getElementById('mu-err');
+
+  if(!name || !username) { err.textContent='Nombre y usuario son obligatorios.'; err.style.display='block'; return; }
+  if(!editingUserId && !pwd) { err.textContent='La contraseña es obligatoria para usuarios nuevos.'; err.style.display='block'; return; }
+  if(pwd && pwd.length < 6) { err.textContent='La contraseña debe tener al menos 6 caracteres.'; err.style.display='block'; return; }
+
+  const perms = ['dashboard','leads','delete_leads','export','stats','users'].filter(p => document.getElementById('p-'+p).checked);
+  const users = getUsers();
+  const dupCheck = users.find(u => u.username === username && u.id !== editingUserId);
+  if(dupCheck) { err.textContent='Ese nombre de usuario ya existe.'; err.style.display='block'; return; }
+
+  if(editingUserId) {
+    const idx = users.findIndex(u=>u.id===editingUserId);
+    if(idx===-1) return;
+    users[idx].name = name;
+    users[idx].username = username;
+    if(pwd) users[idx].password = pwd;
+    users[idx].role = role;
+    users[idx].active = active;
+    users[idx].permissions = perms;
+    logActivity('edit_user', `Usuario editado: ${name}`, currentUser?.id);
+  } else {
+    users.push({ id:'u-'+Date.now(), name, username, password:pwd, role, permissions:perms, active, created:new Date().toISOString(), lastLogin:null });
+    logActivity('create_user', `Usuario creado: ${name}`, currentUser?.id);
+  }
+
+  saveUsers(users);
+  closeModal('modal-user');
+  renderUsers();
+  renderDashboard();
+}
+
+let deletingUserId = null;
+function askDeleteUser(id, name) {
+  deletingUserId = id;
+  document.getElementById('del-user-name').textContent = name;
+  openModal('modal-del-user');
+}
+function confirmDeleteUser() {
+  if(!deletingUserId) return;
+  const users = getUsers().filter(u=>u.id!==deletingUserId);
+  logActivity('delete_user', `Usuario eliminado (id: ${deletingUserId})`, currentUser?.id);
+  saveUsers(users);
+  deletingUserId = null;
+  closeModal('modal-del-user');
+  renderUsers();
+  renderDashboard();
+}
+
+// Abrir modal cambiar contraseña propia (limpia campos)
+function openChangePwd() {
+  ['pwd-old','pwd-new','pwd-confirm'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('pwd-err').style.display = 'none';
+  document.getElementById('pwd-ok').style.display = 'none';
+  openModal('modal-pwd');
+}
+
+// Cambiar contraseña propia
+function changePassword() {
+  const oldPwd  = document.getElementById('pwd-old').value;
+  const newPwd  = document.getElementById('pwd-new').value;
+  const confPwd = document.getElementById('pwd-confirm').value;
+  const err = document.getElementById('pwd-err');
+  const ok  = document.getElementById('pwd-ok');
+  err.style.display = 'none'; ok.style.display = 'none';
+  const users = getUsers();
+  const u = users.find(u => u.id === currentUser.id);
+  if (!u || u.password !== oldPwd) { err.textContent = 'La contraseña actual no es correcta.'; err.style.display = 'block'; return; }
+  if (newPwd.length < 6) { err.textContent = 'La nueva contraseña debe tener al menos 6 caracteres.'; err.style.display = 'block'; return; }
+  if (newPwd !== confPwd) { err.textContent = 'Las contraseñas no coinciden.'; err.style.display = 'block'; return; }
+  u.password = newPwd;
+  saveUsers(users);
+  currentUser.password = newPwd;
+  logActivity('change_pwd', 'Contraseña propia cambiada', currentUser.id);
+  ok.style.display = 'block';
+  setTimeout(() => closeModal('modal-pwd'), 1400);
+}
+
+// Resetear contraseña de otro usuario (solo owner)
+let resetTargetId = null;
+function openResetPwd(userId, userName) {
+  resetTargetId = userId;
+  document.getElementById('reset-user-name').textContent = userName;
+  ['reset-pwd-new','reset-pwd-confirm'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('reset-pwd-err').style.display = 'none';
+  document.getElementById('reset-pwd-ok').style.display = 'none';
+  openModal('modal-reset-pwd');
+}
+function resetPassword() {
+  const newPwd  = document.getElementById('reset-pwd-new').value;
+  const confPwd = document.getElementById('reset-pwd-confirm').value;
+  const err = document.getElementById('reset-pwd-err');
+  const ok  = document.getElementById('reset-pwd-ok');
+  err.style.display = 'none'; ok.style.display = 'none';
+  if (newPwd.length < 6) { err.textContent = 'La contraseña debe tener al menos 6 caracteres.'; err.style.display = 'block'; return; }
+  if (newPwd !== confPwd) { err.textContent = 'Las contraseñas no coinciden.'; err.style.display = 'block'; return; }
+  const users = getUsers();
+  const u = users.find(u => u.id === resetTargetId);
+  if (!u) return;
+  u.password = newPwd;
+  saveUsers(users);
+  logActivity('reset_pwd', `Contraseña reseteada para: ${u.name}`, currentUser.id);
+  ok.style.display = 'block';
+  setTimeout(() => closeModal('modal-reset-pwd'), 1400);
+}
+
+// Olvidé mi contraseña — acceso de emergencia
+const EMERGENCY_PWD = 'FI-Emergency-2025';
+function openForgot() {
+  document.getElementById('forgot-user').value = '';
+  document.getElementById('forgot-emergency').value = '';
+  document.getElementById('forgot-err').style.display = 'none';
+  document.getElementById('emergency-hint').textContent = EMERGENCY_PWD;
+  openModal('modal-forgot');
+}
+function doForgotLogin() {
+  const uname = document.getElementById('forgot-user').value.trim();
+  const emPwd = document.getElementById('forgot-emergency').value;
+  const err   = document.getElementById('forgot-err');
+  err.style.display = 'none';
+  if (emPwd !== EMERGENCY_PWD) { err.textContent = 'Contraseña de emergencia incorrecta.'; err.style.display = 'block'; return; }
+  const users  = getUsers();
+  const owner  = users.find(u => u.username === uname && u.role === 'owner');
+  if (!owner) { err.textContent = 'Solo el propietario puede usar la contraseña de emergencia.'; err.style.display = 'block'; return; }
+  owner.lastLogin = new Date().toISOString();
+  saveUsers(users);
+  currentUser = owner;
+  setSession(owner);
+  logActivity('emergency_login', `Acceso de emergencia: ${owner.name}`, owner.id);
+  closeModal('modal-forgot');
+  bootAdmin(owner);
+}
+
+// ════════════════════════════════════════════
+// ACTIVIDAD
+// ════════════════════════════════════════════
+function getActivity() { try { return JSON.parse(localStorage.getItem(SK_ACTIVITY)||'[]'); } catch { return []; } }
+function logActivity(type, text, userId) {
+  const log = getActivity();
+  const user = getUsers().find(u=>u.id===userId);
+  log.unshift({ type, text, user: user?.name||'Sistema', date: new Date().toISOString() });
+  localStorage.setItem(SK_ACTIVITY, JSON.stringify(log.slice(0,200)));
+}
+const ACT_ICONS = { login:'🟢', logout:'🔴', create_user:'👤', edit_user:'✏️', delete_user:'🗑️', delete_lead:'🗑️', clear_leads:'⚠️', export:'📥', change_pwd:'🔑' };
+function renderActivity() {
+  const logs = getActivity();
+  const list = document.getElementById('act-list');
+  list.innerHTML = logs.length ? logs.map(l=>`
+    <div class="act-item">
+      <div class="act-icon" style="background:var(--gris-fondo)">${ACT_ICONS[l.type]||'•'}</div>
+      <div class="act-body"><div class="act-text">${esc(l.text)} <span style="color:var(--texto-suave);font-weight:400">— ${esc(l.user)}</span></div><div class="act-time">${fmtDate(l.date)}</div></div>
+    </div>`).join('')
+    : '<p style="text-align:center;color:var(--texto-suave);font-size:.85rem;padding:32px">Sin actividad registrada.</p>';
+}
+function clearActivity() {
+  if(!confirm('¿Limpiar el registro de actividad?')) return;
+  localStorage.removeItem(SK_ACTIVITY);
+  renderActivity();
+}
+
+// ════════════════════════════════════════════
+// MODALES HELPER
+// ════════════════════════════════════════════
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', function(e) { if(e.target===this) closeModal(this.id); });
+});
+</script>
+</body>
+</html>

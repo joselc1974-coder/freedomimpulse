@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreedomImpulse — Diagnóstico Operativo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Nunito:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --azul: #0F172A;
+  --azul-mid: #1E293B;
+  --naranja: #EA580C;
+  --naranja-light: #FB923C;
+  --gris-fondo: #F8FAFC;
+  --gris-borde: #E2E8F0;
+  --blanco: #FFFFFF;
+  --texto-suave: #64748B;
+  --texto-medio: #334155;
+  --max: 680px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body { font-family: 'Nunito', sans-serif; background: var(--blanco); color: var(--azul); line-height: 1.65; overflow-x: hidden; }
+a { color: inherit; text-decoration: none; }
+
+/* NOISE */
+.noise { position: relative; }
+.noise::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+.noise > * { position: relative; z-index: 1; }
+
+/* SCROLL REVEAL */
+.reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1); }
+.reveal.visible { opacity: 1; transform: none; }
+.d1 { transition-delay: 0.1s; }
+.d2 { transition-delay: 0.2s; }
+.d3 { transition-delay: 0.32s; }
+
+/* TOPBAR */
+.topbar {
+  background: var(--naranja);
+  color: var(--blanco);
+  text-align: center;
+  padding: 10px 16px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  line-height: 1.5;
+}
+
+/* NAV */
+nav {
+  position: sticky; top: 0; z-index: 200;
+  padding: 15px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(15,23,42,0.97);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.logo { font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 1rem; letter-spacing: -0.04em; color: var(--blanco); }
+.logo span { color: var(--naranja); }
+.nav-cta {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--naranja); color: var(--blanco);
+  font-family: 'Outfit', sans-serif; font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 9px 16px; border-radius: 4px;
+  transition: background 0.2s, transform 0.15s;
+}
+.nav-cta:active { transform: scale(0.96); }
+
+/* HERO */
+.hero {
+  background: var(--azul);
+  padding: 60px 24px 56px;
+  min-height: 88svh;
+  display: flex; align-items: center;
+  overflow: hidden;
+}
+.hero-glow-1 {
+  position: absolute; border-radius: 50%; pointer-events: none;
+  width: 480px; height: 480px;
+  background: radial-gradient(circle, rgba(234,88,12,0.16) 0%, transparent 65%);
+  top: -100px; right: -140px;
+}
+.hero-glow-2 {
+  position: absolute; border-radius: 50%; pointer-events: none;
+  width: 260px; height: 260px;
+  background: radial-gradient(circle, rgba(234,88,12,0.08) 0%, transparent 65%);
+  bottom: -40px; left: -60px;
+}
+.hero-inner { max-width: var(--max); margin: 0 auto; width: 100%; }
+.hero-rule { display: block; width: 32px; height: 3px; background: var(--naranja); margin-bottom: 24px; border-radius: 2px; }
+.hero h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(2.3rem, 9vw, 4rem);
+  font-weight: 900; line-height: 1.06;
+  color: var(--blanco); letter-spacing: -0.04em;
+  margin-bottom: 22px;
+}
+.hero h1 .n { color: var(--naranja); }
+.hero-sub {
+  font-size: 1rem; color: rgba(248,250,252,0.62);
+  line-height: 1.75; font-weight: 300; max-width: 520px; margin-bottom: 36px;
+}
+.hero-sub strong { color: rgba(248,250,252,0.88); font-weight: 500; }
+.hero-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--naranja); color: var(--blanco);
+  font-family: 'Outfit', sans-serif; font-size: 0.9rem; font-weight: 700;
+  letter-spacing: 0.03em; padding: 16px 26px; border-radius: 6px;
+  box-shadow: 0 4px 28px rgba(234,88,12,0.38);
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+.hero-btn:active { transform: scale(0.97); }
+.hero-btn svg { width: 17px; height: 17px; stroke: white; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.scroll-hint {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 44px; font-size: 0.68rem;
+  color: rgba(248,250,252,0.25); letter-spacing: 0.08em; text-transform: uppercase;
+}
+.scroll-dot {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.12);
+  display: flex; align-items: center; justify-content: center;
+}
+.scroll-dot::after {
+  content: ''; width: 4px; height: 4px;
+  background: var(--naranja); border-radius: 50%;
+  animation: blink 2.2s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.35;transform:scale(0.65)} }
+
+/* VIDEO */
+.video-s { background: var(--azul-mid); padding: 0 24px 52px; }
+.video-inner { max-width: var(--max); margin: 0 auto; padding-top: 36px; }
+.video-box {
+  aspect-ratio: 16/9; background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 10px; display: flex;
+  flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; overflow: hidden; position: relative;
+  transition: background 0.3s, border-color 0.3s;
+}
+.video-box::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(234,88,12,0.07) 0%, transparent 70%);
+}
+.video-box:active { background: rgba(255,255,255,0.07); }
+.play-btn {
+  width: 64px; height: 64px; border-radius: 50%; background: var(--naranja);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 14px; position: relative; z-index: 1;
+  animation: pulse-ring 2.8s infinite;
+  box-shadow: 0 0 0 0 rgba(234,88,12,0.45);
+}
+@keyframes pulse-ring {
+  0%{box-shadow:0 0 0 0 rgba(234,88,12,0.5)} 70%{box-shadow:0 0 0 20px rgba(234,88,12,0)} 100%{box-shadow:0 0 0 0 rgba(234,88,12,0)}
+}
+.play-btn svg { width: 24px; height: 24px; fill: white; margin-left: 4px; }
+.video-cap { color: rgba(248,250,252,0.38); font-size: 0.8rem; font-style: italic; font-weight: 300; position: relative; z-index: 1; }
+
+/* OFERTA */
+.oferta { background: var(--gris-fondo); padding: 60px 24px; border-top: 3px solid var(--naranja); }
+.oferta-in { max-width: var(--max); margin: 0 auto; }
+.oferta h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(1.6rem, 6.5vw, 2.4rem);
+  font-weight: 800; letter-spacing: -0.03em; line-height: 1.15;
+  margin-bottom: 22px; color: var(--azul);
+}
+.oferta-body { font-size: 1rem; color: var(--texto-medio); line-height: 1.82; font-weight: 400; }
+.oferta-body p { margin-bottom: 15px; }
+.oferta-body p:last-child { margin-bottom: 0; }
+.oferta-body strong { color: var(--azul); font-weight: 600; }
+.alerta {
+  margin: 28px 0; padding: 18px 18px 18px 22px;
+  background: var(--azul); border-left: 3px solid var(--naranja); border-radius: 0 6px 6px 0;
+}
+.alerta p { font-size: 0.92rem; color: rgba(248,250,252,0.72); line-height: 1.65; font-weight: 300; }
+.alerta strong { color: var(--naranja-light); font-weight: 600; }
+
+/* BTN */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--naranja); color: var(--blanco);
+  font-family: 'Outfit', sans-serif; font-size: 0.88rem; font-weight: 700;
+  letter-spacing: 0.04em; padding: 16px 24px; border-radius: 6px;
+  box-shadow: 0 4px 20px rgba(234,88,12,0.28);
+  transition: background 0.2s, transform 0.15s;
+  cursor: pointer; border: none; width: 100%;
+}
+.btn:active { transform: scale(0.97); }
+.btn-wrap { margin-top: 28px; }
+
+/* MÉTRICAS */
+.metricas { background: var(--azul); padding: 44px 24px; }
+.metricas-g { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); }
+.m { text-align: center; padding: 16px 8px; border-right: 1px solid rgba(255,255,255,0.06); }
+.m:last-child { border-right: none; }
+.m-n { font-family: 'Outfit', sans-serif; font-size: clamp(1.7rem,7vw,2.8rem); font-weight: 900; color: var(--naranja); letter-spacing: -0.05em; line-height: 1; margin-bottom: 5px; }
+.m-l { font-size: 0.68rem; color: rgba(248,250,252,0.38); font-weight: 400; line-height: 1.4; }
+
+/* SECCIÓN */
+.s { padding: 60px 24px; }
+.s.dark { background: var(--azul); }
+.s.mid { background: var(--azul-mid); }
+.s.alt { background: var(--gris-fondo); }
+.s.white { background: var(--blanco); }
+.s-in { max-width: var(--max); margin: 0 auto; }
+.s h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(1.65rem, 6vw, 2.3rem);
+  font-weight: 800; letter-spacing: -0.035em; line-height: 1.12;
+  margin-bottom: 22px; color: var(--azul);
+}
+.s.dark h2, .s.mid h2 { color: var(--blanco); }
+.txt { font-size: 0.97rem; color: var(--texto-medio); line-height: 1.82; font-weight: 400; }
+.txt p { margin-bottom: 16px; }
+.txt p:last-child { margin-bottom: 0; }
+.txt strong { color: var(--azul); font-weight: 600; }
+.s.dark .txt, .s.mid .txt { color: rgba(248,250,252,0.62); }
+.s.dark .txt strong, .s.mid .txt strong { color: rgba(248,250,252,0.92); }
+
+/* CITA */
+.cita {
+  margin: 24px 0; padding: 20px 18px 20px 22px;
+  background: rgba(255,255,255,0.04);
+  border-left: 3px solid var(--naranja); border-radius: 0 8px 8px 0;
+}
+.cita em { font-style: italic; color: rgba(248,250,252,0.78); font-size: 1.02rem; line-height: 1.7; font-weight: 300; }
+
+/* FRASE GRANDE */
+.big-q {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(1.35rem, 5.5vw, 1.9rem);
+  font-weight: 800; color: var(--blanco);
+  line-height: 1.2; margin: 32px 0 24px; letter-spacing: -0.03em;
+}
+.big-q span { color: var(--naranja); }
+
+/* DOS COLUMNAS */
+.two { display: grid; grid-template-columns: 1fr; gap: 14px; margin: 24px 0; }
+@media (min-width: 540px) { .two { grid-template-columns: 1fr 1fr; } }
+
+.card {
+  padding: 20px 18px; border-radius: 8px;
+  border: 1px solid var(--gris-borde); background: var(--blanco);
+}
+.card.si { border-top: 3px solid var(--naranja); }
+.card.no { border-top: 3px solid var(--gris-borde); background: #F1F5F9; }
+.card-tag {
+  font-family: 'Outfit', sans-serif; font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 14px; color: var(--texto-suave);
+}
+.card.si .card-tag { color: var(--naranja); }
+.card ul { list-style: none; }
+.card li {
+  display: flex; align-items: flex-start; gap: 9px; padding: 7px 0;
+  border-bottom: 1px solid var(--gris-borde);
+  font-size: 0.86rem; color: var(--texto-medio); line-height: 1.5; font-weight: 400;
+}
+.card li:last-child { border-bottom: none; padding-bottom: 0; }
+.card li::before { content: '✕'; color: #94A3B8; flex-shrink: 0; font-size: 0.72rem; margin-top: 2px; }
+.card.si li::before { content: '✓'; color: var(--naranja); font-weight: 700; }
+
+/* ESCALERA */
+.ladder { margin-top: 24px; border-radius: 8px; overflow: hidden; border: 1px solid var(--gris-borde); }
+.step { display: flex; border-bottom: 1px solid var(--gris-borde); }
+.step:last-child { border-bottom: none; }
+.step-n {
+  background: var(--azul); min-width: 76px; flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 18px 8px; text-align: center;
+}
+.step-n .sn-label { font-family: 'Outfit', sans-serif; font-size: 0.56rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(248,250,252,0.3); margin-bottom: 3px; }
+.step-n .sn-price { font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 900; color: var(--naranja); letter-spacing: -0.04em; line-height: 1; }
+.step-n .sn-free { font-family: 'Outfit', sans-serif; font-size: 0.62rem; font-weight: 700; color: var(--naranja-light); text-transform: uppercase; }
+.step-n .sn-sub { font-size: 0.56rem; color: rgba(248,250,252,0.78); margin-top: 3px; line-height: 1.4; }
+.step-b { padding: 18px 18px; background: var(--blanco); }
+.step-b h4 { font-family: 'Outfit', sans-serif; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--texto-suave); margin-bottom: 3px; }
+.step-b .st { font-family: 'Outfit', sans-serif; font-size: 0.92rem; font-weight: 700; color: var(--azul); margin-bottom: 7px; letter-spacing: -0.02em; }
+.step-b p { font-size: 0.85rem; color: var(--texto-medio); line-height: 1.62; font-weight: 400; }
+
+/* RESULTADOS */
+.results { margin: 24px 0; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.07); }
+.result { display: flex; align-items: flex-start; gap: 14px; padding: 16px 18px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.result:last-child { border-bottom: none; }
+.rn { font-family: 'Outfit', sans-serif; font-weight: 900; color: var(--naranja); font-size: 0.92rem; flex-shrink: 0; min-width: 42px; letter-spacing: -0.02em; }
+.result p { font-size: 0.88rem; color: rgba(248,250,252,0.6); line-height: 1.55; font-weight: 300; }
+
+/* FIRMA */
+.firma { margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.07); font-size: 0.88rem; color: rgba(248,250,252,0.38); font-style: italic; font-weight: 300; line-height: 1.65; }
+
+/* CHART */
+.chart-box {
+  margin: 24px 0; background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 20px 16px 14px;
+}
+.chart-title { font-size: 0.65rem; color: rgba(248,250,252,0.3); font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 18px; }
+#bar-chart { display: flex; align-items: flex-end; gap: 4px; height: 120px; margin-bottom: 10px; }
+.chart-foot {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 9px; border-top: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.68rem; color: rgba(248,250,252,0.28);
+}
+#chart-counter { font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 1.15rem; color: var(--naranja); letter-spacing: -0.04em; }
+
+/* OPCIONES */
+.ops { display: grid; grid-template-columns: 1fr; gap: 14px; margin: 30px 0 28px; }
+@media (min-width: 540px) { .ops { grid-template-columns: 1fr 1fr; } }
+.op { padding: 22px 18px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.07); }
+.op.no { background: rgba(255,255,255,0.02); }
+.op.si { background: rgba(234,88,12,0.08); border-color: rgba(234,88,12,0.22); }
+.op-tag { font-family: 'Outfit', sans-serif; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 9px; }
+.op.no .op-tag { color: rgba(248,250,252,0.22); }
+.op.si .op-tag { color: var(--naranja-light); }
+.op h3 { font-family: 'Outfit', sans-serif; font-size: 0.97rem; font-weight: 800; color: var(--blanco); margin-bottom: 9px; letter-spacing: -0.02em; }
+.op p { font-size: 0.85rem; color: rgba(248,250,252,0.48); line-height: 1.6; font-weight: 300; }
+
+/* CTA FINAL */
+.cta-s { background: var(--azul); padding: 68px 24px; position: relative; overflow: hidden; }
+.cta-g { position: absolute; pointer-events: none; border-radius: 50%; background: radial-gradient(circle, rgba(234,88,12,0.11) 0%, transparent 65%); width: 380px; height: 380px; bottom: -90px; right: -90px; }
+.cta-in { max-width: var(--max); margin: 0 auto; position: relative; }
+.cta-s h2 { font-family: 'Outfit', sans-serif; font-size: clamp(1.7rem,7vw,2.7rem); font-weight: 900; color: var(--blanco); letter-spacing: -0.04em; line-height: 1.1; }
+.cta-note { text-align: center; margin-top: 12px; font-size: 0.75rem; color: rgba(248,250,252,0.28); font-style: italic; }
+
+/* STICKY */
+.sticky { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15,23,42,0.98); border-top: 1px solid rgba(255,255,255,0.08); padding: 12px 20px calc(12px + env(safe-area-inset-bottom)); z-index: 300; transition: opacity 0.3s; backdrop-filter: blur(12px); }
+.sticky .btn { border-radius: 6px; font-size: 0.85rem; padding: 14px 20px; }
+@media (max-width: 768px) { .sticky { display: block; } }
+
+/* FOOTER */
+footer { background: #07090F; padding: 28px 24px calc(24px + env(safe-area-inset-bottom)); text-align: center; border-top: 1px solid rgba(255,255,255,0.04); }
+.f-logo { font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 0.88rem; letter-spacing: -0.03em; color: rgba(248,250,252,0.18); margin-bottom: 8px; }
+.f-logo span { color: rgba(234,88,12,0.45); }
+footer p { font-size: 0.7rem; color: rgba(248,250,252,0.15); font-weight: 300; }
+
+/* DESKTOP */
+@media (min-width: 768px) {
+  .hero { padding: 84px 40px 72px; min-height: auto; }
+  .video-s { padding: 0 40px 60px; }
+  .oferta, .s, .metricas, .cta-s { padding-left: 40px; padding-right: 40px; }
+  .sticky { display: none !important; }
+  .btn { width: auto; min-width: 260px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">Solo para dueños de empresas de manufactura y logística en Latinoamérica · Facturación €500K – €7M</div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Freedom<span>Impulse</span></div>
+  <a href="#agendar" class="nav-cta">Agendar →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero noise">
+  <div class="hero-glow-1"></div>
+  <div class="hero-glow-2"></div>
+  <div class="hero-inner">
+    <span class="hero-rule reveal"></span>
+    <h1 class="reveal d1">
+      Invertiste <span class="n">€20.000+</span> en un ERP.<br>
+      Tu equipo <span class="n">lo usa como Excel caro.</span><br>
+      Tu planta opera al 60%.
+    </h1>
+    <p class="hero-sub reveal d2">
+      El problema no es el software. Es que <strong>nadie cambió la cabeza de tu equipo antes de instalarlo.</strong>
+      Descubre cómo recuperar esa inversión y multiplicar tu producción por 2x en 90 días, sin contratar más personal ni cambiar tu sistema.
+    </p>
+    <a href="#agendar" class="hero-btn reveal d3">
+      Quiero mi Diagnóstico Gratuito
+      <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </a>
+    <div class="scroll-hint reveal d3">
+      <div class="scroll-dot"></div>
+      <span>Sigue leyendo</span>
+    </div>
+  </div>
+</section>
+
+<!-- VIDEO -->
+<section class="video-s">
+  <div class="video-inner reveal">
+    <div class="video-box" onclick="this.style.padding='0';this.style.background='#000';this.style.border='none';this.style.borderRadius='10px';this.innerHTML='<iframe width=100% height=100% src=https://www.youtube.com/embed/VIDEO_ID?autoplay=1 frameborder=0 allowfullscreen style=border-radius:10px></iframe>';">
+      <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      <p class="video-cap">Mira este video de 5 minutos antes de continuar.</p>
+    </div>
+  </div>
+</section>
+
+<!-- OFERTA -->
+<section class="oferta" id="agendar">
+  <div class="oferta-in">
+    <h2 class="reveal">Los primeros 5 Diagnósticos Operativos son sin coste. Después: 500€.</h2>
+    <div class="oferta-body reveal d1">
+      <p>Estoy abriendo operaciones en Latinoamérica. Y en vez de decirte lo bueno que soy, prefiero demostrártelo.</p>
+      <p>No es un diagnóstico de 15 minutos donde te digo lo que quieres oír. Es el mismo trabajo por el que a partir del sexto cobraré 500€.</p>
+      <p>Sales con un mapa claro de qué está frenando tu planta y qué hacer al respecto. <strong>Si después decidimos trabajar juntos, los 500€ se descuentan. Si no, te quedas con el diagnóstico y aquí no ha pasado nada.</strong></p>
+    </div>
+    <div class="alerta reveal d2">
+      <p><strong>No sé cuánto tardarán en llenarse los 5 espacios.</strong> Puede ser una semana o puede ser un día. Cuando se llenen, el siguiente paga 500€.</p>
+    </div>
+    <div class="btn-wrap reveal d3"><a href="#" class="btn">Quiero mi Diagnóstico Operativo Gratuito →</a></div>
+  </div>
+</section>
+
+<!-- MÉTRICAS -->
+<section class="metricas noise">
+  <div class="metricas-g">
+    <div class="m reveal"><div class="m-n">25+</div><div class="m-l">Años en piso de planta</div></div>
+    <div class="m reveal d1"><div class="m-n">7x</div><div class="m-l">Aumento promedio de productividad</div></div>
+    <div class="m reveal d2"><div class="m-n">€20M+</div><div class="m-l">En inversiones rescatadas</div></div>
+  </div>
+</section>
+
+<!-- SECCIÓN 1 -->
+<section class="s dark noise">
+  <div class="s-in">
+    <h2 class="reveal">Son las 11 de la noche.<br>Y los números siguen igual.</h2>
+    <div class="cita reveal d1"><em>"Gastamos €40.000 en este sistema. ¿Cómo es posible que sigamos igual?"</em></div>
+    <div class="txt reveal d2">
+      <p>El sistema está instalado. Técnicamente funciona. Te lo vendieron con promesas de control total, visibilidad completa, eficiencia.</p>
+      <p>Pero bajas al piso de planta y tu gente sigue anotando en cuadernos. Manda los datos por WhatsApp. Usa Excel "porque el sistema es muy lento". Y tu supervisor más antiguo lleva meses diciendo que antes era mejor, y lo está contagiando.</p>
+      <p>Tú sigues apagando incendios que el sistema supuestamente iba a eliminar.</p>
+    </div>
+    <div class="big-q reveal d2">Tienes un Ferrari estacionado en tu planta.<br><span>Y tu equipo lo maneja como un triciclo.</span></div>
+  </div>
+</section>
+
+<!-- SECCIÓN 2 -->
+<section class="s alt">
+  <div class="s-in">
+    <h2 class="reveal">No es culpa del software.<br>Nunca lo fue.</h2>
+    <div class="txt reveal d1">
+      <p>Contrataste capacitaciones. Tu equipo asistió, asintió con la cabeza y volvió a hacer exactamente lo mismo.</p>
+      <p>Migraste a otro sistema. Gastaste otros €40.000. Mismos resultados con diferente pantalla.</p>
+      <p>Contrataste directivos estrella. Algunos duraron 6 meses. Otros, menos.</p>
+      <p>Y la planta sigue al 60%.</p>
+      <p>Tu equipo no rechaza el sistema porque no lo entienda. Lo rechaza porque lo ve como una amenaza. Como algo que les van a usar en su contra. Y mientras eso no cambie, da igual lo que instales o a quién contrates.</p>
+      <p>Lo he visto durante 25 años. Siempre es lo mismo. <strong>El software está bien. La maquinaria está bien. El problema está arriba. Y se nota abajo.</strong></p>
+    </div>
+    <div class="btn-wrap reveal d2"><a href="#agendar" class="btn">Quiero mi Diagnóstico Operativo →</a></div>
+  </div>
+</section>
+
+<!-- SECCIÓN 3 -->
+<section class="s dark noise">
+  <div class="s-in">
+    <h2 class="reveal">No vendemos software.<br>No lo implementamos.<br>Instalamos la mentalidad para usarlo.</h2>
+    <div class="two reveal d1">
+      <div class="card no">
+        <div class="card-tag">Lo que NO hacemos</div>
+        <ul>
+          <li>Charlas motivacionales</li>
+          <li>Frases bonitas en la pared</li>
+          <li>Team building con dinámicas</li>
+          <li>Más capacitaciones del sistema</li>
+        </ul>
+      </div>
+      <div class="card si">
+        <div class="card-tag">Lo que SÍ hacemos</div>
+        <ul>
+          <li>Diagnóstico de tu gente, no del sistema</li>
+          <li>Reestructurar cómo tu liderazgo habla con el piso</li>
+          <li>Transformar la resistencia en adopción voluntaria</li>
+          <li>Cambiar cómo se implementan los cambios</li>
+        </ul>
+      </div>
+    </div>
+    <div class="txt reveal d2">
+      <p><strong>El resultado: tu gente adopta el sistema que ya pagaste. Tu inversión empieza a rendir. Y tu planta produce lo que siempre debió producir.</strong></p>
+      <p>Sin contratar más personal. Sin cambiar de software. Sin despedir a nadie.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SECCIÓN 4: CASO REAL -->
+<section class="s mid noise">
+  <div class="s-in">
+    <h2 class="reveal">Lo que pasa cuando la operación se desbloquea.</h2>
+    <div class="txt reveal d1">
+      <p>500 empleados. ERP instalado. Normas ISO. Tres directivos en dos años. Ninguno movió la aguja. Estaban a punto de hacer un despido masivo.</p>
+      <p>Me llamaron como último recurso.</p>
+      <p>El piso de planta estaba en modo supervivencia: cumplir el mínimo, no meterse en problemas, irse a casa. No era un problema de maquinaria ni de sistema. Era un problema de cómo se dirigía a la gente.</p>
+      <p>Trabajamos la estructura de liderazgo. Recalibramos los incentivos. Eliminamos los cuellos de botella que nadie veía porque todos estaban demasiado ocupados apagando incendios.</p>
+    </div>
+    <div class="chart-box reveal d2" id="chart-container">
+      <div class="chart-title">Unidades producidas por día — misma gente · mismo ERP</div>
+      <div id="bar-chart"></div>
+      <div class="chart-foot">
+        <span>Antes</span>
+        <span id="chart-counter">200</span>
+        <span>Después</span>
+      </div>
+    </div>
+    <div class="results reveal d3">
+      <div class="result"><span class="rn">90d</span><p>Un equipo que boicoteaba el sistema pasó a adopción total y voluntaria en 90 días.</p></div>
+      <div class="result"><span class="rn">3.5x</span><p>De 4.500 a 16.000 reparaciones mensuales. Sin aumentar nómina. Sin comprar equipos.</p></div>
+      <div class="result"><span class="rn">+85%</span><p>Plantas que operaban al 40% llegaron al 85% de capacidad con el personal que ya tenían.</p></div>
+    </div>
+    <div class="firma reveal">No soy académico de escritorio. Llevo 25 años en piso de planta, en los entornos más difíciles de Latinoamérica y España, resolviendo lo que los integradores de software no ven: el factor humano.</div>
+    <div class="btn-wrap reveal"><a href="#agendar" class="btn">Quiero mi Diagnóstico Operativo →</a></div>
+  </div>
+</section>
+
+<!-- SECCIÓN 5: CALIFICACIÓN -->
+<section class="s alt">
+  <div class="s-in">
+    <h2 class="reveal">Nuestro método no es para todos.</h2>
+    <div class="txt reveal d1"><p>Es una intervención directa en la cultura operativa de tu empresa. No buscamos clientes. Buscamos casos donde podamos generar un cambio real.</p></div>
+    <div class="two reveal d2">
+      <div class="card si">
+        <div class="card-tag">Esto es para ti si…</div>
+        <ul>
+          <li>Eres Dueño, Director General o de Operaciones de una empresa industrial o logística en Latam.</li>
+          <li>Facturas entre €500K y €7M anuales.</li>
+          <li>Ya invertiste en un ERP y sientes que fue dinero tirado.</li>
+          <li>Sabes que estás dejando dinero sobre la mesa pero no logras identificar por qué.</li>
+          <li>Estás dispuesto a mirar la operación con honestidad, aunque lo que encuentres sea incómodo.</li>
+        </ul>
+      </div>
+      <div class="card no">
+        <div class="card-tag">Esto NO es para ti si…</div>
+        <ul>
+          <li>Eres una micro-empresa o startup sin procesos productivos establecidos.</li>
+          <li>Necesitas 3 comités para aprobar un cambio operativo.</li>
+          <li>Agendas y no asistes, o quieres resultados sin involucrarte.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECCIÓN 6: ESCALERA -->
+<section class="s white">
+  <div class="s-in">
+    <h2 class="reveal">Así es como trabajamos.<br>Sin letra pequeña.</h2>
+    <div class="txt reveal d1"><p>No me gusta que la gente llegue sin saber qué esperar. Aquí está todo: cómo funciona, cuánto cuesta cada paso, qué recibes. Si los números no encajan, mejor saberlo ahora.</p></div>
+    <div class="ladder reveal d2">
+      <div class="step">
+        <div class="step-n">
+          <div class="sn-label">Paso 1</div>
+          <div class="sn-free">Gratis*</div>
+          <div class="sn-sub">*5 primeros<br>Después 500€</div>
+        </div>
+        <div class="step-b">
+          <h4>Diagnóstico Operativo</h4>
+          <div class="st">La sesión de diagnóstico a fondo</div>
+          <p>Analizamos tu operación, cómo opera tu equipo y dónde están los bloqueos reales. Sales con un mapa claro. Si decidimos trabajar juntos, los 500€ se descuentan.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n"><div class="sn-label">Paso 2</div><div class="sn-price">1.500€</div></div>
+        <div class="step-b">
+          <h4>Diagnóstico Profundo</h4>
+          <div class="st">Análisis cuantitativo completo</div>
+          <p>Datos duros, entrevistas con tu equipo, mapeo de cuellos de botella y plan de acción concreto. Este documento es la hoja de ruta de todo lo que viene después.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n"><div class="sn-label">Paso 3</div><div class="sn-price" style="font-size:0.9rem;line-height:1.2;">6.000€<span style="font-size:0.56rem;font-weight:400;display:block;letter-spacing:0;">/trimestre</span></div></div>
+        <div class="step-b">
+          <h4>Proyecto de Transformación</h4>
+          <div class="st">Implementación trimestral</div>
+          <p>Trabajamos con tu equipo una vez por semana durante un trimestre. Implementamos, ajustamos y medimos. La mayoría ve cambios significativos en el primer trimestre.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-s noise">
+  <div class="cta-g"></div>
+  <div class="cta-in">
+    <h2 class="reveal">Qué pasa si no haces nada vs. si actúas hoy.</h2>
+    <div class="ops reveal d1">
+      <div class="op no">
+        <div class="op-tag">Opción A — No hacer nada</div>
+        <h3>Seguir igual.</h3>
+        <p>Seguir pagando mantenimiento por un software que nadie usa. Seguir al 60%. Seguir siendo el bombero mientras tu competencia avanza.</p>
+      </div>
+      <div class="op si">
+        <div class="op-tag">Opción B — Agendar hoy</div>
+        <h3>Recuperar lo que ya pagaste.</h3>
+        <p>Si estás entre los 5 primeros, es sin coste. En cualquier caso, sales sabiendo exactamente qué frena tu operación.</p>
+      </div>
+    </div>
+    <div class="reveal d2" style="max-width:400px;margin:0 auto;">
+      <a href="#" class="btn">Quiero mi Diagnóstico Operativo →</a>
+      <p class="cta-note">Los 5 primeros son sin coste. Cuando se llenen, el siguiente paga 500€.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="f-logo">Freedom<span>Impulse</span></div>
+  <div style="display:flex;justify-content:center;gap:20px;margin-bottom:10px;">
+    <a href="fi-privacidad.html" target="_blank" rel="noopener" style="font-size:.72rem;color:rgba(248,250,252,.28);font-weight:400;transition:color .2s;" onmouseover="this.style.color='rgba(248,250,252,.6)'" onmouseout="this.style.color='rgba(248,250,252,.28)'">Política de Privacidad</a>
+    <a href="fi-cookies.html" target="_blank" rel="noopener" style="font-size:.72rem;color:rgba(248,250,252,.28);font-weight:400;transition:color .2s;" onmouseover="this.style.color='rgba(248,250,252,.6)'" onmouseout="this.style.color='rgba(248,250,252,.28)'">Política de Cookies</a>
+  </div>
+  <p>© 2025 FreedomImpulse. Todos los derechos reservados.</p>
+</footer>
+
+<!-- STICKY MOBILE -->
+<div class="sticky" id="sticky-bar">
+  <a href="#agendar" class="btn">Agendar Diagnóstico Gratuito →</a>
+</div>
+
+<script>
+/* SCROLL REVEAL */
+const ro = new IntersectionObserver(e => e.forEach(x => {
+  if(x.isIntersecting) { x.target.classList.add('visible'); }
+  else { x.target.classList.remove('visible'); }
+}), {threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+
+/* STICKY — ocultar sobre hero */
+const sb = document.getElementById('sticky-bar');
+const heroEl = document.querySelector('.hero');
+sb.style.opacity = '0'; sb.style.pointerEvents = 'none';
+new IntersectionObserver(e => {
+  const show = !e[0].isIntersecting;
+  sb.style.opacity = show ? '1' : '0';
+  sb.style.pointerEvents = show ? 'auto' : 'none';
+},{threshold:0.05}).observe(heroEl);
+
+/* CHART */
+(function(){
+  const months=['M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12'];
+  const vals=[200,210,230,270,320,380,450,510,560,610,660,700];
+  const max=700, el=document.getElementById('bar-chart'), ctr=document.getElementById('chart-counter');
+  months.forEach((m,i)=>{
+    const w=document.createElement('div');
+    w.style.cssText='flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;height:100%;';
+    const b=document.createElement('div');
+    b.style.cssText=`width:100%;background:${i===11?'var(--naranja)':'rgba(234,88,12,0.28)'};height:0;transition:height 0.7s ${i*0.07}s cubic-bezier(.4,0,.2,1);border-radius:2px 2px 0 0;`;
+    b.dataset.h=Math.round((vals[i]/max)*100);
+    const lb=document.createElement('span');
+    lb.style.cssText='font-size:0.48rem;color:rgba(248,250,252,0.18);white-space:nowrap;';
+    lb.textContent=m; w.appendChild(b); w.appendChild(lb); el.appendChild(w);
+  });
+  let done=false;
+  new IntersectionObserver(e=>{
+    if(e[0].isIntersecting){
+      if(done) return; done=true;
+      el.querySelectorAll('[data-h]').forEach(b=>{ b.style.height=b.dataset.h+'%'; });
+      let c=200; const t=setInterval(()=>{ c=Math.min(c+8,700); ctr.textContent=c.toLocaleString('es-ES'); if(c>=700)clearInterval(t); },16);
+    } else {
+      done=false;
+      el.querySelectorAll('[data-h]').forEach(b=>{ b.style.height='0%'; });
+      ctr.textContent='200';
+    }
+  },{threshold:0.35}).observe(document.getElementById('chart-container'));
+})();
+</script>
+
+<!-- ══════════════════════════════════════════════
+     MODAL DE CALIFICACIÓN
+══════════════════════════════════════════════ -->
+<div id="modal-overlay" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(7,9,15,0.88);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);overflow-y:auto;padding:20px 16px;">
+  <div id="modal-box" style="max-width:560px;margin:0 auto;background:var(--blanco);border-radius:12px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.5);position:relative;">
+
+    <!-- CABECERA -->
+    <div style="background:var(--azul);padding:24px 24px 20px;position:relative;">
+      <!-- Barra de progreso -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <span id="modal-step-label" style="font-family:'Outfit',sans-serif;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(248,250,252,0.4);">Paso 1 de 8</span>
+        <button onclick="closeModal()" style="background:none;border:none;cursor:pointer;color:rgba(248,250,252,0.4);font-size:1.3rem;line-height:1;padding:0 2px;transition:color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(248,250,252,0.4)'">✕</button>
+      </div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:99px;height:4px;overflow:hidden;">
+        <div id="modal-progress" style="background:var(--naranja);height:100%;border-radius:99px;width:12.5%;transition:width 0.4s cubic-bezier(.4,0,.2,1);"></div>
+      </div>
+    </div>
+
+    <!-- CONTENIDO DE PASOS -->
+    <div id="modal-body" style="padding:28px 24px 24px;">
+
+      <!-- PASO 1 -->
+      <div class="modal-step" id="step-1">
+        <p style="font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:-0.02em;color:var(--azul);margin-bottom:6px;">¿Cuál es tu rol en la empresa?</p>
+        <p style="font-size:0.82rem;color:var(--texto-suave);margin-bottom:20px;font-weight:400;">Selecciona una opción.</p>
+        <div class="radio-group" data-q="1">
+          <label class="opt-row"><input type="radio" name="q1" value="Propietario/Fundador/Socio mayoritario"><span>Propietario / Fundador / Socio mayoritario</span></label>
+          <label class="opt-row"><input type="radio" name="q1" value="CEO/Director General"><span>CEO / Director General</span></label>
+          <label class="opt-row"><input type="radio" name="q1" value="Director de Operaciones/Planta"><span>Director de Operaciones / Planta</span></label>
+          <label class="opt-row"><input type="radio" name="q1" value="Gerente de Producción"><span>Gerente de Producción</span></label>
+          <label class="opt-row opt-other"><input type="radio" name="q1" value="__otro__"><span>Otro cargo</span></label>
+          <input class="other-input" id="q1-other" type="text" placeholder="Especifica tu cargo…" style="display:none;">
+        </div>
+      </div>
+
+      <!-- PASO 2 -->
+      <div class="modal-step" id="step-2" style="display:none;">
+        <p style="font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:-0.02em;color:var(--azul);margin-bottom:6px;">¿Cuántos empleados tiene tu empresa?</p>
+        <p style="font-size:0.82rem;color:var(--texto-suave);margin-bottom:20px;">Selecciona una opción.</p>
+        <div class="radio-group" data-q="2">
+          <label class="opt-row"><input type="radio" name="q2" value="1-10 empleados"><span>1 – 10 empleados</span></label>
+          <label class="opt-row"><input type="radio" name="q2" value="11-25 empleados"><span>11 – 25 empleados</span></label>
+          <label class="opt-row"><input type="radio" name="q2" value="25-50 empleados"><span>25 – 50 empleados</span></label>
+          <label class="opt-row"><input type="radio" name="q2" value="51-100 empleados"><span>51 – 100 empleados</span></label>
+          <label class="opt-row"><input type="radio" name="q2" value="100+ empleados"><span>100+ empleados</span></label>
+        </div>
+      </div>
+
+      <!-- PASO 3 -->
+      <div class="modal-step" id="step-3" style="display:none;">
+        <p style="font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:-0.02em;color:var(--azul);margin-bottom:6px;">¿Cuál es tu industria o sector?</p>
+        <p style="font-size:0.82rem;color:var(--texto-suave);margin-bottom:20px;">Selecciona una opción.</p>
+        <div class="radio-group" data-q="3">
+          <label class="opt-row"><input type="radio" name="q3" value="Manufactura/Fabricación"><span>Manufactura / Fabricación</span></label>
+          <label class="opt-row"><input type="radio" name="q3" value="Logística/Distribución"><span>Logística / Distribución</span></label>
+          <label class="opt-row"><input type="radio" name="q3" value="Servicios industriales"><span>Servicios industriales (reparación, mantenimiento)</span></label>
+          <label class="opt-row"><input type="radio" name="q3" value="Producción de alimentos/bebidas"><span>Producción de alimentos / bebidas</span></label>
+          <label class="opt-row"><input type="radio" name="q3" value="Construcción/Obras"><span>Construcción / Obras</span></label>
+          <label class="opt-row opt-other"><input type="radio" name="q3" value="__otro__"><span>Otro sector</span></label>
+          <input class="other-input" id="q3-other" type="text" placeholder="Especifica tu sector…" style="display:none;">
+        </div>
+      </div>
+
+      <!-- PASO 4 -->
+      <div class="modal-step" id="step-4" style="display:none;">
+        <p style="font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:-0.02em;color:var(--azul);margin-bottom:6px;">¿Cuál describe mejor tu empresa ahora mismo?</p>
+        <p style="font-size:0.82rem;color:var(--texto-suave);margin-bottom:20px;">Puedes elegir hasta 2 opciones.</p>
+        <div class="check-group" data-q="4" data-max="2">
+          <label class="opt-row"><input type="checkbox" name="q4" value="ERP/CRM sin adopción"><span>Implementamos un ERP/CRM y el equipo no lo usa (o lo usa mal)</span></label>
+          <label class="opt-row"><input type="checkbox" name="q4" value="Planta por debajo de capacidad"><span>Nuestra planta opera muy por debajo de su capacidad real</span></label>
+          <label class="opt-row"><input type="checkbox" name="q4" value="Equipo rechaza mejoras"><span>Intentamos mejoras (Lean, ISO, procesos) pero el equipo las rechaza</span></label>
+          <label class="opt-row"><input type="checkbox" name="q4" value="Conflicto entre directivos"><span>Mis directivos están en conflicto constante entre áreas</span></label>
+          <label class="opt-row"><input type="checkbox" name="q4" value="Apagando fuegos"><span>Paso más del 70% de mi tiempo apagando fuegos operativos</span></label>
+          <label class="opt-row opt-other"><input type="checkbox" name="q4" value="__otro__"><span>Ninguna de las anteriores</span></label>
+          <input class="other-input" id="q4-other" type="text" placeholder="Cuéntanos brevemente…" style="display:none;">
+        </div>
+      </div>
+
+      <!-- PASO 5 -->
+      <div class="modal-step" id="step-5" style="display:none;">
+        <p style="font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:-0.02em;color:var(--azul);margin-bottom:6px;">¿Qué tan urgente es resolver este problema?</p>
+        <p style="font-size:0.82rem;color:var(--texto-suave);margin-bottom:28px;">Mueve el deslizador del 1 al 10.</p>
+        <div style="padding:0 4px;">
+          <input type="range" id="q5-range" min="1" max="10" value="5" style="width:100%;accent-color:var(--naranja);cursor:pointer;height:6px;">
+          <div style="display:flex;justify-content:space-between;margin-top:10px;">
+            <span style="font-size:0.72rem;color:var(--texto-suave);">1 — Puedo esperar</span>
+            <span id="q5-val" style="font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:900;color:var(--naranja);">5</span>
+            <span style="font-size:0.72rem;color:var(--texto-suave);">10 — Necesito resolverlo YA</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PASO 6 -->
+      <div class="modal-step" id="step-6" style="display:none;">
+        <p style="font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:-0.02em;color:var(--azul);margin-bottom:6px;">¿Has invertido en alguna de estas soluciones en los últimos 3 años?</p>
+        <p style="font-size:0.82rem;color:var(--texto-suave);margin-bottom:20px;">Puedes elegir varias opciones.</p>
+        <div class="check-group" data-q="6">
+          <label class="opt-row"><input type="checkbox" name="q6" value="ERP/CRM/Software"><span>ERP / CRM / Software de gestión</span></label>
+          <label class="opt-row"><input type="checkbox" name="q6" value="Consultoría Lean/Six Sigma"><span>Consultoría Lean / Six Sigma</span></label>
+          <label class="opt-row"><input type="checkbox" name="q6" value="Certificación ISO"><span>Certificación ISO</span></label>
+          <label class="opt-row"><input type="checkbox" name="q6" value="Coaching empresarial"><span>Coaching empresarial</span></label>
+          <label class="opt-row"><input type="checkbox" name="q6" value="Formación para directivos"><span>Formación para directivos / equipos</span></label>
+          <label class="opt-row"><input type="checkbox" name="q6" value="Ninguna"><span>Ninguna de las anteriores</span></label>
+        </div>
+      </div>
+
+      <!-- PASO 7 -->
+      <div class="modal-step" id="step-7" style="display:none;">
+        <p style="font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:-0.02em;color:var(--azul);margin-bottom:6px;">¿Cómo se llama tu empresa?</p>
+        <p style="font-size:0.82rem;color:var(--texto-suave);margin-bottom:20px;">Texto corto.</p>
+        <input id="q7-input" type="text" placeholder="Nombre de tu empresa…" class="text-input">
+      </div>
+
+      <!-- PASO 8 -->
+      <div class="modal-step" id="step-8" style="display:none;">
+        <p style="font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:-0.02em;color:var(--azul);margin-bottom:6px;">¿En qué ciudad y país estás?</p>
+        <p style="font-size:0.82rem;color:var(--texto-suave);margin-bottom:20px;">Texto corto.</p>
+        <input id="q8-input" type="text" placeholder="Ej: Ciudad de México, México…" class="text-input">
+      </div>
+
+      <!-- PASO FINAL: BOOKING -->
+      <div class="modal-step" id="step-final" style="display:none;">
+        <div style="text-align:center;padding:8px 0 16px;">
+          <div style="width:52px;height:52px;border-radius:50%;background:rgba(234,88,12,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--naranja)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <p style="font-family:'Outfit',sans-serif;font-size:1.15rem;font-weight:800;color:var(--azul);letter-spacing:-0.02em;margin-bottom:8px;">¡Perfecto! Ya casi terminamos.</p>
+          <p style="font-size:0.88rem;color:var(--texto-suave);line-height:1.65;margin-bottom:24px;">Elige el día y la hora que mejor te venga. En la siguiente pantalla te pediremos tu correo y teléfono para confirmar.</p>
+          <a id="booking-link" href="https://TU-ENLACE-DE-BUILDERALL.com" target="_blank" class="btn" style="width:100%;max-width:360px;margin:0 auto;display:flex;">
+            Elegir fecha y hora →
+          </a>
+          <p style="font-size:0.72rem;color:var(--texto-suave);margin-top:12px;font-style:italic;">La sesión dura entre 45 y 60 minutos. Por videollamada.</p>
+        </div>
+      </div>
+
+      <!-- ERROR -->
+      <p id="modal-error" style="display:none;color:#DC2626;font-size:0.8rem;margin-top:12px;font-weight:500;">Por favor selecciona una opción antes de continuar.</p>
+
+    </div>
+
+    <!-- BOTONES DE NAVEGACIÓN -->
+    <div style="padding:0 24px 24px;display:flex;gap:12px;align-items:center;" id="modal-nav">
+      <button id="btn-back" onclick="modalBack()" style="display:none;flex:1;background:none;border:1px solid var(--gris-borde);color:var(--texto-suave);font-family:'Outfit',sans-serif;font-size:0.85rem;font-weight:600;padding:14px;border-radius:6px;cursor:pointer;transition:all 0.2s;">← Atrás</button>
+      <button id="btn-next" onclick="modalNext()" style="flex:2;background:var(--naranja);color:white;font-family:'Outfit',sans-serif;font-size:0.88rem;font-weight:700;padding:15px;border-radius:6px;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(234,88,12,0.3);transition:all 0.2s;letter-spacing:0.03em;">Continuar →</button>
+    </div>
+
+  </div>
+</div>
+
+<style>
+/* MODAL OPCIONES */
+.opt-row {
+  display:flex; align-items:flex-start; gap:12px;
+  padding:12px 14px; border:1.5px solid var(--gris-borde);
+  border-radius:8px; cursor:pointer; margin-bottom:8px;
+  transition:border-color 0.18s, background 0.18s;
+  font-size:0.9rem; color:var(--texto-medio); font-weight:400;
+  line-height:1.4; user-select:none;
+}
+.opt-row:last-of-type { margin-bottom:0; }
+.opt-row:hover { border-color:var(--naranja); background:rgba(234,88,12,0.03); }
+.opt-row input[type=radio], .opt-row input[type=checkbox] {
+  accent-color:var(--naranja); width:17px; height:17px; flex-shrink:0; margin-top:1px; cursor:pointer;
+}
+.opt-row.selected { border-color:var(--naranja); background:rgba(234,88,12,0.05); }
+.opt-row span { flex:1; }
+.other-input, .text-input {
+  width:100%; border:1.5px solid var(--gris-borde); border-radius:8px;
+  padding:12px 14px; font-family:'Nunito',sans-serif; font-size:0.92rem;
+  color:var(--azul); outline:none; transition:border-color 0.2s;
+  margin-top:8px;
+}
+.other-input:focus, .text-input:focus { border-color:var(--naranja); }
+</style>
+
+<script>
+/* ── MODAL ── */
+let currentStep = 1;
+const totalSteps = 8;
+const answers = {};
+
+function openModal() {
+  currentStep = 1;
+  document.getElementById('modal-overlay').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  showStep(1);
+}
+function closeModal() {
+  document.getElementById('modal-overlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+// Cerrar al hacer click fuera del modal
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+function showStep(n) {
+  document.querySelectorAll('.modal-step').forEach(s => s.style.display = 'none');
+  const isFinal = n > totalSteps;
+  if (isFinal) {
+    document.getElementById('step-final').style.display = 'block';
+    document.getElementById('modal-nav').style.display = 'none';
+  } else {
+    document.getElementById('step-' + n).style.display = 'block';
+    document.getElementById('modal-nav').style.display = 'flex';
+    document.getElementById('btn-back').style.display = n > 1 ? 'block' : 'none';
+    document.getElementById('btn-next').textContent = n === totalSteps ? 'Ver mi agenda →' : 'Continuar →';
+  }
+  document.getElementById('modal-step-label').textContent = isFinal ? 'Listo' : `Paso ${n} de ${totalSteps}`;
+  document.getElementById('modal-progress').style.width = (Math.min(n, totalSteps) / totalSteps * 100) + '%';
+  document.getElementById('modal-error').style.display = 'none';
+  // Scroll al top del modal
+  document.getElementById('modal-box').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function modalNext() {
+  const err = document.getElementById('modal-error');
+  err.style.display = 'none';
+
+  // Validación por paso
+  if (currentStep === 1) {
+    const sel = document.querySelector('input[name=q1]:checked');
+    if (!sel) { err.style.display='block'; return; }
+    answers.rol = sel.value === '__otro__' ? (document.getElementById('q1-other').value || 'Otro') : sel.value;
+  }
+  if (currentStep === 2) {
+    const sel = document.querySelector('input[name=q2]:checked');
+    if (!sel) { err.style.display='block'; return; }
+    answers.empleados = sel.value;
+  }
+  if (currentStep === 3) {
+    const sel = document.querySelector('input[name=q3]:checked');
+    if (!sel) { err.style.display='block'; return; }
+    answers.sector = sel.value === '__otro__' ? (document.getElementById('q3-other').value || 'Otro') : sel.value;
+  }
+  if (currentStep === 4) {
+    const sels = [...document.querySelectorAll('input[name=q4]:checked')];
+    if (!sels.length) { err.style.display='block'; return; }
+    const vals = sels.map(s => s.value === '__otro__' ? (document.getElementById('q4-other').value || 'Otro') : s.value);
+    answers.situacion = vals.join(', ');
+  }
+  if (currentStep === 5) {
+    answers.urgencia = document.getElementById('q5-range').value;
+  }
+  if (currentStep === 6) {
+    const sels = [...document.querySelectorAll('input[name=q6]:checked')];
+    answers.inversiones = sels.length ? sels.map(s=>s.value).join(', ') : 'Ninguna';
+  }
+  if (currentStep === 7) {
+    const v = document.getElementById('q7-input').value.trim();
+    if (!v) { err.textContent='Por favor escribe el nombre de tu empresa.'; err.style.display='block'; return; }
+    answers.empresa = v;
+  }
+  if (currentStep === 8) {
+    const v = document.getElementById('q8-input').value.trim();
+    if (!v) { err.textContent='Por favor escribe tu ciudad y país.'; err.style.display='block'; return; }
+    answers.ciudad = v;
+  }
+
+  currentStep++;
+  showStep(currentStep);
+
+  // Si llegó al paso final, guardar respuesta y construir URL de Builderall
+  if (currentStep > totalSteps) {
+    const base = 'https://TU-ENLACE-DE-BUILDERALL.com';
+    const params = new URLSearchParams({
+      rol: answers.rol || '',
+      empleados: answers.empleados || '',
+      sector: answers.sector || '',
+      situacion: answers.situacion || '',
+      urgencia: answers.urgencia || '',
+      inversiones: answers.inversiones || '',
+      empresa: answers.empresa || '',
+      ciudad: answers.ciudad || ''
+    });
+    document.getElementById('booking-link').href = base + '?' + params.toString();
+
+    // ── GUARDAR EN localStorage ──
+    try {
+      const entry = { ...answers, fecha: new Date().toISOString(), id: Date.now() };
+      const stored = JSON.parse(localStorage.getItem('fi_responses') || '[]');
+      stored.push(entry);
+      localStorage.setItem('fi_responses', JSON.stringify(stored));
+    } catch(e) {}
+  }
+}
+
+function modalBack() {
+  if (currentStep > 1) { currentStep--; showStep(currentStep); }
+}
+
+// Rango Q5
+document.getElementById('q5-range').addEventListener('input', function() {
+  document.getElementById('q5-val').textContent = this.value;
+});
+
+// Selección visual en radio
+document.querySelectorAll('.radio-group').forEach(g => {
+  g.querySelectorAll('input[type=radio]').forEach(inp => {
+    inp.addEventListener('change', function() {
+      g.querySelectorAll('.opt-row').forEach(r => r.classList.remove('selected'));
+      this.closest('.opt-row').classList.add('selected');
+      // Mostrar/ocultar campo "otro"
+      const q = g.dataset.q;
+      const otherInput = document.getElementById('q'+q+'-other');
+      if (otherInput) {
+        if (this.value === '__otro__') { otherInput.style.display='block'; otherInput.focus(); }
+        else { otherInput.style.display='none'; }
+      }
+    });
+  });
+});
+
+// Selección visual en checkboxes + límite de 2
+document.querySelectorAll('.check-group').forEach(g => {
+  g.querySelectorAll('input[type=checkbox]').forEach(inp => {
+    inp.addEventListener('change', function() {
+      const maxSel = g.dataset.max ? parseInt(g.dataset.max) : 99;
+      const checked = [...g.querySelectorAll('input[type=checkbox]:checked')];
+      if (checked.length > maxSel) { this.checked = false; return; }
+      this.closest('.opt-row').classList.toggle('selected', this.checked);
+      // Otro
+      const q = g.dataset.q;
+      const otherInput = document.getElementById('q'+q+'-other');
+      if (otherInput && this.value === '__otro__') {
+        if (this.checked) { otherInput.style.display='block'; otherInput.focus(); }
+        else { otherInput.style.display='none'; }
+      }
+    });
+  });
+});
+
+// Conectar TODOS los botones CTA al modal
+document.querySelectorAll('.btn, .hero-btn, .nav-cta').forEach(btn => {
+  if (btn.href === '#' || btn.getAttribute('href') === '#' || btn.getAttribute('href') === '#agendar') {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      openModal();
+    });
+  }
+});
+</script>
+</body>
+</html>
