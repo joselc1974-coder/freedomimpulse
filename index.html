@@ -801,6 +801,12 @@ new IntersectionObserver(e => {
         </div>
         <!-- Builderall Booking Iframe -->
         <iframe src="https://booking.builderall.com/embed/8cf9d8912bb94762fc9d5699b6be7062?show_event_infos=true" frameborder="0" width="100%" height="100%" style="min-height:720px;border-radius:8px;display:block;"></iframe>
+        <div style="text-align:center;margin-top:16px;">
+          <p style="font-size:.78rem;color:var(--texto-suave);margin-bottom:10px;font-style:italic;">¿Ya elegiste tu fecha y hora? Haz click aquí para continuar.</p>
+          <a href="fi-post-booking.html" style="display:inline-flex;align-items:center;gap:6px;background:var(--verde);color:#fff;font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:700;padding:11px 22px;border-radius:6px;letter-spacing:.03em;transition:background .2s;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='var(--verde)'">
+            Reserva confirmada — Continuar →
+          </a>
+        </div>
         <p style="font-size:0.72rem;color:var(--texto-suave);margin-top:12px;text-align:center;font-style:italic;">La sesión dura entre 45 y 60 minutos. Por videollamada.</p>
       </div>
 
@@ -861,9 +867,31 @@ function closeModal() {
   document.body.style.overflow = '';
 }
 
-// Cerrar al hacer click fuera del modal
-document.getElementById('modal-overlay').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
+// Cerrar modal SOLO con la X — no al hacer click fuera
+
+// Detectar confirmación de reserva de Builderall y redirigir al post-booking
+window.addEventListener('message', function(e) {
+  if (!e.data) return;
+  const data = typeof e.data === 'string' ? e.data : JSON.stringify(e.data);
+  // Builderall emite distintos eventos según la versión — capturamos todos los relevantes
+  const esConfirmacion = (
+    data.includes('booking_confirmed') ||
+    data.includes('appointment_confirmed') ||
+    data.includes('confirmed') ||
+    data.includes('success') ||
+    data.includes('scheduled') ||
+    (typeof e.data === 'object' && (
+      e.data.type === 'booking_confirmed' ||
+      e.data.event === 'confirmed' ||
+      e.data.status === 'confirmed' ||
+      e.data.status === 'success'
+    ))
+  );
+  if (esConfirmacion) {
+    setTimeout(() => {
+      window.location.href = 'fi-post-booking.html';
+    }, 800);
+  }
 });
 
 function showStep(n) {
