@@ -206,6 +206,7 @@ tbody td{padding:12px 14px;font-size:.82rem;color:var(--texto-medio);vertical-al
 /* RESPONSIVE */
 @media(max-width:1100px){.stats-grid{grid-template-columns:repeat(2,1fr)}.charts-row{grid-template-columns:1fr}}
 @media(max-width:768px){.sidebar{display:none}.main{margin-left:0;max-width:100%;padding:18px 14px}}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -261,6 +262,7 @@ tbody td{padding:12px 14px;font-size:.82rem;color:var(--texto-medio);vertical-al
         </div>
       </nav>
       <div class="sb-footer">
+        <div id="sync-status" style="padding:0 10px 10px;min-height:22px;"></div>
         <button class="logout-btn" onclick="doLogout()">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           Cerrar sesión
@@ -591,10 +593,13 @@ function bootAdmin(user) {
   document.getElementById('sb-avatar').textContent = user.name.charAt(0).toUpperCase();
   document.getElementById('sb-avatar').style.background = avatarColor(user.name);
 
-  // Ocultar tabs sin permiso
   applyNavPermissions(user);
-  populateSectorFilter();
-  renderDashboard();
+
+  // Cargar datos desde API y luego pintar
+  cargarDatos().then(() => {
+    populateSectorFilter();
+    renderDashboard();
+  });
 }
 
 function applyNavPermissions(user) {
@@ -626,16 +631,82 @@ function showTab(name) {
     const ni = document.getElementById('ni-'+t);
     if(ni) ni.classList.toggle('active', t===name);
   });
-  if(name==='leads') renderLeads();
-  if(name==='estadisticas') renderStats();
-  if(name==='usuarios') renderUsers();
-  if(name==='actividad') renderActivity();
+  if(name==='usuarios') { renderUsers(); return; }
+  if(name==='actividad') { renderActivity(); return; }
+  // Para tabs de datos: recargar desde API primero
+  if(['dashboard','leads','estadisticas'].includes(name)) {
+    cargarDatos().then(() => {
+      if(name==='dashboard') { populateSectorFilter(); renderDashboard(); }
+      if(name==='leads')     { populateSectorFilter(); renderLeads(); }
+      if(name==='estadisticas') renderStats();
+    });
+  }
 }
 
 // ════════════════════════════════════════════
-// DATA HELPERS
+// DATA — API CLOUDFLARE + localStorage fallback
 // ════════════════════════════════════════════
-function getData() { try { return JSON.parse(localStorage.getItem(SK_RESPONSES)||'[]'); } catch { return []; } }
+const API_URL = 'https://freedom-api.joselc1974.workers.dev';
+let _cachedData = null;   // cache en memoria
+let _loadingData = false;
+
+// Normaliza un registro de la API al mismo formato que localStorage
+function normalizeRecord(r, idx) {
+  return {
+    id:          r.id        || r.timestamp || (Date.now() + idx),
+    empresa:     r.empresa   || '',
+    rol:         r.rol       || '',
+    empleados:   r.empleados || '',
+    sector:      r.sector    || '',
+    situacion:   r.situacion || '',
+    urgencia:    String(r.urgencia || ''),
+    inversiones: r.inversiones || '',
+    ciudad:      r.ciudad    || '',
+    fecha:       r.fecha     || r.created_at || r.timestamp
+                 ? new Date(r.fecha || r.created_at || r.timestamp).toISOString()
+                 : new Date().toISOString()
+  };
+}
+
+// Carga datos desde la API, con fallback a localStorage
+async function cargarDatos() {
+  setSyncStatus('loading');
+  try {
+    const res = await fetch(API_URL + '/data');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const raw = await res.json();
+    const lista = Array.isArray(raw) ? raw : (raw.data || raw.results || []);
+    _cachedData = lista.map((r, i) => normalizeRecord(r, i));
+    // Sincronizar también a localStorage como backup
+    localStorage.setItem(SK_RESPONSES, JSON.stringify(_cachedData));
+    setSyncStatus('ok', _cachedData.length + ' leads cargados desde servidor');
+    console.log('✅ Datos cargados desde API:', _cachedData.length);
+    return _cachedData;
+  } catch(err) {
+    console.warn('⚠️ API no disponible, usando localStorage:', err.message);
+    setSyncStatus('warn', 'Sin conexión con el servidor — mostrando datos locales');
+    _cachedData = JSON.parse(localStorage.getItem(SK_RESPONSES) || '[]');
+    return _cachedData;
+  }
+}
+
+// getData() síncrono — devuelve cache, o localStorage si aún no cargó
+function getData() {
+  if (_cachedData !== null) return _cachedData;
+  try { return JSON.parse(localStorage.getItem(SK_RESPONSES) || '[]'); } catch { return []; }
+}
+
+// Indicador de sync en el sidebar
+function setSyncStatus(state, msg) {
+  const el = document.getElementById('sync-status');
+  if (!el) return;
+  const icons = { loading: '⟳', ok: '●', warn: '⚠️' };
+  const colors = { loading: 'rgba(255,255,255,.3)', ok: '#10B981', warn: '#F59E0B' };
+  el.innerHTML = `<span style="color:${colors[state]};font-size:.7rem;display:flex;align-items:center;gap:5px;">
+    <span style="${state==='loading'?'animation:spin .8s linear infinite;display:inline-block':''}">${icons[state]}</span>
+    <span>${msg || (state==='loading'?'Sincronizando…': state==='ok'?'Sincronizado':'')}</span>
+  </span>`;
+}
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function short(s,n) { return s&&s.length>n ? s.slice(0,n)+'…':s; }
 function fmtDate(iso) {
