@@ -796,13 +796,12 @@ new IntersectionObserver(e => {
           <div style="width:52px;height:52px;border-radius:50%;background:rgba(234,88,12,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--naranja)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <p style="font-family:'Outfit',sans-serif;font-size:1.15rem;font-weight:800;color:var(--azul);letter-spacing:-0.02em;margin-bottom:8px;">¡Perfecto! Ya casi terminamos.</p>
-          <p style="font-size:0.88rem;color:var(--texto-suave);line-height:1.65;margin-bottom:24px;">Elige el día y la hora que mejor te venga. En la siguiente pantalla te pediremos tu correo y teléfono para confirmar.</p>
-          <a id="booking-link" href="https://TU-ENLACE-DE-BUILDERALL.com" target="_blank" class="btn" style="width:100%;max-width:360px;margin:0 auto;display:flex;">
-            Elegir fecha y hora →
-          </a>
-          <p style="font-size:0.72rem;color:var(--texto-suave);margin-top:12px;font-style:italic;">La sesión dura entre 45 y 60 minutos. Por videollamada.</p>
+          <p style="font-family:'Outfit',sans-serif;font-size:1.15rem;font-weight:800;color:var(--azul);letter-spacing:-0.02em;margin-bottom:6px;">¡Perfecto! Elige tu fecha y hora.</p>
+          <p style="font-size:.85rem;color:var(--texto-suave);line-height:1.6;margin-bottom:20px;">Selecciona el día y la hora que mejor te venga. Te llegará la confirmación por correo.</p>
         </div>
+        <!-- Builderall Booking Iframe -->
+        <iframe src="https://booking.builderall.com/embed/8cf9d8912bb94762fc9d5699b6be7062?show_event_infos=true" frameborder="0" width="100%" height="100%" style="min-height:720px;border-radius:8px;display:block;"></iframe>
+        <p style="font-size:0.72rem;color:var(--texto-suave);margin-top:12px;text-align:center;font-style:italic;">La sesión dura entre 45 y 60 minutos. Por videollamada.</p>
       </div>
 
       <!-- ERROR -->
@@ -873,9 +872,12 @@ function showStep(n) {
   if (isFinal) {
     document.getElementById('step-final').style.display = 'block';
     document.getElementById('modal-nav').style.display = 'none';
+    // Ampliar el modal para el iframe
+    document.getElementById('modal-box').style.maxWidth = '780px';
   } else {
     document.getElementById('step-' + n).style.display = 'block';
     document.getElementById('modal-nav').style.display = 'flex';
+    document.getElementById('modal-box').style.maxWidth = '560px';
     document.getElementById('btn-back').style.display = n > 1 ? 'block' : 'none';
     document.getElementById('btn-next').textContent = n === totalSteps ? 'Ver mi agenda →' : 'Continuar →';
   }
@@ -946,9 +948,25 @@ function modalNext() {
       empresa: answers.empresa || '',
       ciudad: answers.ciudad || ''
     });
-    document.getElementById('booking-link').href = base + '?' + params.toString();
+    // ── ENVIAR A CLOUDFLARE WORKER ──
+    fetch('https://freedom-api.joselc1974.workers.dev/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        empresa:     answers.empresa     || '',
+        rol:         answers.rol         || '',
+        empleados:   answers.empleados   || '',
+        sector:      answers.sector      || '',
+        situacion:   answers.situacion   || '',
+        urgencia:    parseInt(answers.urgencia) || 0,
+        inversiones: answers.inversiones || '',
+        ciudad:      answers.ciudad      || ''
+      })
+    })
+    .then(() => console.log('✅ Datos enviados al servidor'))
+    .catch(err => console.error('❌ Error al enviar datos:', err));
 
-    // ── GUARDAR EN localStorage ──
+    // ── GUARDAR EN localStorage (backup local) ──
     try {
       const entry = { ...answers, fecha: new Date().toISOString(), id: Date.now() };
       const stored = JSON.parse(localStorage.getItem('fi_responses') || '[]');
