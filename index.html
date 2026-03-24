@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="fabicon.png">
 <title>FreedomImpulse — Diagnóstico Operativo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Nunito:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
@@ -792,22 +793,29 @@ new IntersectionObserver(e => {
 
       <!-- PASO FINAL: BOOKING -->
       <div class="modal-step" id="step-final" style="display:none;">
-        <div style="text-align:center;padding:8px 0 16px;">
-          <div style="width:52px;height:52px;border-radius:50%;background:rgba(234,88,12,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--naranja)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <div style="text-align:center;padding:8px 0 14px;">
+          <div style="width:48px;height:48px;border-radius:50%;background:rgba(234,88,12,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--naranja)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <p style="font-family:'Outfit',sans-serif;font-size:1.15rem;font-weight:800;color:var(--azul);letter-spacing:-0.02em;margin-bottom:6px;">¡Perfecto! Elige tu fecha y hora.</p>
-          <p style="font-size:.85rem;color:var(--texto-suave);line-height:1.6;margin-bottom:20px;">Selecciona el día y la hora que mejor te venga. Te llegará la confirmación por correo.</p>
+          <p style="font-family:'Outfit',sans-serif;font-size:1.05rem;font-weight:800;color:var(--azul);letter-spacing:-0.02em;margin-bottom:4px;">Elige tu fecha y hora.</p>
+          <p style="font-size:.82rem;color:var(--texto-suave);line-height:1.55;margin-bottom:16px;">Selecciona un día y una hora. Cuando el calendario confirme tu reserva, pulsa el botón verde de abajo.</p>
         </div>
+
         <!-- Builderall Booking Iframe -->
-        <iframe src="https://booking.builderall.com/embed/8cf9d8912bb94762fc9d5699b6be7062?show_event_infos=true" frameborder="0" width="100%" height="100%" style="min-height:720px;border-radius:8px;display:block;"></iframe>
-        <div style="text-align:center;margin-top:16px;">
-          <p style="font-size:.78rem;color:var(--texto-suave);margin-bottom:10px;font-style:italic;">¿Ya elegiste tu fecha y hora? Haz click aquí para continuar.</p>
-          <a href="fi-post-booking.html" style="display:inline-flex;align-items:center;gap:6px;background:var(--verde);color:#fff;font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:700;padding:11px 22px;border-radius:6px;letter-spacing:.03em;transition:background .2s;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='var(--verde)'">
-            Reserva confirmada — Continuar →
-          </a>
+        <div style="border:1px solid var(--gris-borde);border-radius:8px;overflow:hidden;">
+          <iframe id="booking-iframe" src="https://booking.builderall.com/embed/8cf9d8912bb94762fc9d5699b6be7062?show_event_infos=true" frameborder="0" width="100%" style="min-height:680px;display:block;"></iframe>
         </div>
-        <p style="font-size:0.72rem;color:var(--texto-suave);margin-top:12px;text-align:center;font-style:italic;">La sesión dura entre 45 y 60 minutos. Por videollamada.</p>
+
+        <!-- Botón de confirmación prominente -->
+        <div id="confirm-booking-wrap" style="margin-top:16px;background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(16,185,129,.04));border:2px solid rgba(16,185,129,.3);border-radius:10px;padding:18px 20px;text-align:center;">
+          <p style="font-size:.82rem;color:#065F46;font-weight:600;margin-bottom:12px;">
+            ✅ ¿Ya aparece la confirmación en el calendario de arriba?
+          </p>
+          <a href="fi-post-booking.html" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#10B981;color:#fff;font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:800;padding:14px 32px;border-radius:7px;letter-spacing:.02em;box-shadow:0 4px 16px rgba(16,185,129,.35);transition:background .2s,transform .15s;width:100%;max-width:360px;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10B981'" onmousedown="this.style.transform='scale(.97)'" onmouseup="this.style.transform='scale(1)'">
+            Mi reserva está confirmada — Continuar →
+          </a>
+          <p style="font-size:.72rem;color:#6B7280;margin-top:10px;font-style:italic;">La sesión dura entre 45 y 60 minutos. Por videollamada.</p>
+        </div>
       </div>
 
       <!-- ERROR -->
@@ -869,30 +877,50 @@ function closeModal() {
 
 // Cerrar modal SOLO con la X — no al hacer click fuera
 
-// Detectar confirmación de reserva de Builderall y redirigir al post-booking
+// Detectar confirmación de reserva de Builderall — múltiples métodos
 window.addEventListener('message', function(e) {
   if (!e.data) return;
-  const data = typeof e.data === 'string' ? e.data : JSON.stringify(e.data);
-  // Builderall emite distintos eventos según la versión — capturamos todos los relevantes
-  const esConfirmacion = (
-    data.includes('booking_confirmed') ||
-    data.includes('appointment_confirmed') ||
-    data.includes('confirmed') ||
-    data.includes('success') ||
-    data.includes('scheduled') ||
-    (typeof e.data === 'object' && (
-      e.data.type === 'booking_confirmed' ||
-      e.data.event === 'confirmed' ||
-      e.data.status === 'confirmed' ||
-      e.data.status === 'success'
-    ))
-  );
-  if (esConfirmacion) {
-    setTimeout(() => {
-      window.location.href = 'fi-post-booking.html';
-    }, 800);
+  try {
+    const data = typeof e.data === 'object' ? e.data : JSON.parse(e.data);
+    const confirmKeys = ['booking_confirmed','appointment_confirmed','confirmed','success','scheduled','booked'];
+    const str = JSON.stringify(data).toLowerCase();
+    if (confirmKeys.some(k => str.includes(k))) {
+      redirigirPostBooking();
+    }
+  } catch(e) {
+    // e.data era string plano
+    const str = String(e.data).toLowerCase();
+    if (str.includes('confirm') || str.includes('success') || str.includes('booked') || str.includes('scheduled')) {
+      redirigirPostBooking();
+    }
   }
 });
+
+// Detector por cambio de altura del iframe (Builderall cambia height al mostrar confirmación)
+let iframeLastHeight = 0;
+let bookingConfirmTimer = null;
+function watchIframeForConfirmation() {
+  const iframe = document.getElementById('booking-iframe');
+  if (!iframe) return;
+  bookingConfirmTimer = setInterval(() => {
+    try {
+      const h = iframe.contentWindow?.document?.body?.scrollHeight;
+      if (h && h !== iframeLastHeight) {
+        iframeLastHeight = h;
+        // Si el iframe encogió mucho (pantalla de confirmación es más corta que el calendario)
+        if (h < 500 && iframeLastHeight > 600) {
+          redirigirPostBooking();
+        }
+      }
+    } catch(e) { /* cross-origin bloqueado — normal */ }
+  }, 1000);
+}
+
+function redirigirPostBooking() {
+  if (bookingConfirmTimer) clearInterval(bookingConfirmTimer);
+  // Pequeña pausa para que el usuario vea la confirmación de Builderall
+  setTimeout(() => { window.location.href = 'fi-post-booking.html'; }, 1200);
+}
 
 function showStep(n) {
   document.querySelectorAll('.modal-step').forEach(s => s.style.display = 'none');
@@ -902,6 +930,8 @@ function showStep(n) {
     document.getElementById('modal-nav').style.display = 'none';
     // Ampliar el modal para el iframe
     document.getElementById('modal-box').style.maxWidth = '780px';
+    // Arrancar detector de confirmación
+    setTimeout(watchIframeForConfirmation, 2000);
   } else {
     document.getElementById('step-' + n).style.display = 'block';
     document.getElementById('modal-nav').style.display = 'flex';
