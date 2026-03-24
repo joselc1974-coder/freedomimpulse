@@ -806,15 +806,9 @@ new IntersectionObserver(e => {
           <iframe id="booking-iframe" src="https://booking.builderall.com/embed/8cf9d8912bb94762fc9d5699b6be7062?show_event_infos=true" frameborder="0" width="100%" style="min-height:680px;display:block;"></iframe>
         </div>
 
-        <!-- Botón de confirmación prominente -->
-        <div id="confirm-booking-wrap" style="margin-top:16px;background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(16,185,129,.04));border:2px solid rgba(16,185,129,.3);border-radius:10px;padding:18px 20px;text-align:center;">
-          <p style="font-size:.82rem;color:#065F46;font-weight:600;margin-bottom:12px;">
-            ✅ ¿Ya aparece la confirmación en el calendario de arriba?
-          </p>
-          <a href="fi-post-booking.html" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#10B981;color:#fff;font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:800;padding:14px 32px;border-radius:7px;letter-spacing:.02em;box-shadow:0 4px 16px rgba(16,185,129,.35);transition:background .2s,transform .15s;width:100%;max-width:360px;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10B981'" onmousedown="this.style.transform='scale(.97)'" onmouseup="this.style.transform='scale(1)'">
-            Mi reserva está confirmada — Continuar →
-          </a>
-          <p style="font-size:.72rem;color:#6B7280;margin-top:10px;font-style:italic;">La sesión dura entre 45 y 60 minutos. Por videollamada.</p>
+        <!-- Mensaje de espera — la redirección la gestiona Builderall -->
+        <div id="confirm-booking-wrap" style="margin-top:16px;text-align:center;padding:12px 0 4px;">
+          <p style="font-size:.78rem;color:var(--texto-suave);font-style:italic;">La sesión dura entre 45 y 60 minutos. Por videollamada.</p>
         </div>
       </div>
 
@@ -905,10 +899,11 @@ function watchIframeForConfirmation() {
   bookingConfirmTimer = setInterval(() => {
     try {
       const h = iframe.contentWindow?.document?.body?.scrollHeight;
-      if (h && h !== iframeLastHeight) {
+      if (h && h > 0) {
+        const prevHeight = iframeLastHeight;
         iframeLastHeight = h;
         // Si el iframe encogió mucho (pantalla de confirmación es más corta que el calendario)
-        if (h < 500 && iframeLastHeight > 600) {
+        if (prevHeight > 600 && h < 500) {
           redirigirPostBooking();
         }
       }
