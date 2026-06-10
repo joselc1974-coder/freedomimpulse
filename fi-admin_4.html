@@ -19,19 +19,9 @@
 html{scroll-behavior:smooth}
 body{font-family:'Nunito',sans-serif;background:var(--gris-fondo);color:var(--texto);min-height:100vh}
 
-/* ── LOGIN ── */
-#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--azul);background-image:radial-gradient(circle at 20% 50%,rgba(234,88,12,.13) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(234,88,12,.07) 0%,transparent 40%)}
-.login-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:40px 36px;width:100%;max-width:380px;backdrop-filter:blur(12px)}
-.login-logo{font-family:'Outfit',sans-serif;font-weight:900;font-size:1.15rem;letter-spacing:-.04em;color:#fff;margin-bottom:4px}
-.login-logo span{color:var(--naranja)}
-.login-sub{font-size:.78rem;color:rgba(255,255,255,.35);margin-bottom:32px}
-.lbl{font-family:'Outfit',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:8px;display:block}
-.linput{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:13px 16px;color:#fff;font-family:'Nunito',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s;margin-bottom:16px}
-.linput:focus{border-color:var(--naranja)}
-.linput::placeholder{color:rgba(255,255,255,.2)}
-.login-btn{width:100%;background:var(--naranja);color:#fff;border:none;border-radius:8px;padding:14px;font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:background .2s;letter-spacing:.03em}
-.login-btn:hover{background:#C2410C}
-.login-err{color:#FCA5A5;font-size:.8rem;margin-top:10px;text-align:center;display:none}
+/* ── INTERCEPTOR DE CARGA ── */
+#loading-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--azul);color:#fff}
+.spinner{width:40px;height:40px;border:4px solid rgba(255,255,255,.1);border-top-color:var(--naranja);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:16px}
 
 /* ── LAYOUT ── */
 #admin-screen{display:none}
@@ -212,26 +202,14 @@ tbody td{padding:12px 14px;font-size:.82rem;color:var(--texto-medio);vertical-al
 </head>
 <body>
 
-<!-- ── LOGIN ── -->
-<div id="login-screen">
-  <div class="login-box">
-    <div class="login-logo">Freedom<span>Impulse</span></div>
-    <p class="login-sub">Panel de administración</p>
-    <label class="lbl" for="li-user">Usuario</label>
-    <input type="text" id="li-user" class="linput" placeholder="tu-usuario" autocomplete="username">
-    <label class="lbl" for="li-pwd">Contraseña</label>
-    <input type="password" id="li-pwd" class="linput" placeholder="••••••••" autocomplete="current-password">
-    <button class="login-btn" onclick="doLogin()">Entrar →</button>
-    <p id="login-err" class="login-err">Usuario o contraseña incorrectos.</p>
-    <p style="text-align:center;margin-top:16px"><button onclick="openForgot()" style="background:none;border:none;color:rgba(255,255,255,.3);font-size:.78rem;cursor:pointer;font-family:'Nunito',sans-serif;transition:color .2s" onmouseover="this.style.color='rgba(255,255,255,.6)'" onmouseout="this.style.color='rgba(255,255,255,.3)'">¿Olvidaste tu contraseña?</button></p>
-  </div>
+<div id="loading-screen">
+  <div class="spinner"></div>
+  <p style="font-family:'Outfit',sans-serif;font-size:.9rem;letter-spacing:.05em;color:rgba(255,255,255,.6)">VALIDANDO CREDENCIALES VIA CLOUDFLARE...</p>
 </div>
 
-<!-- ── ADMIN ── -->
 <div id="admin-screen">
   <div class="layout">
 
-    <!-- SIDEBAR -->
     <aside class="sidebar">
       <div class="sb-logo">
         <div class="sb-brand">Freedom<span>Impulse</span></div>
@@ -264,17 +242,15 @@ tbody td{padding:12px 14px;font-size:.82rem;color:var(--texto-medio);vertical-al
       </nav>
       <div class="sb-footer">
         <div id="sync-status" style="padding:0 10px 10px;min-height:22px;"></div>
-        <button class="logout-btn" onclick="doLogout()">
+        <button class="logout-btn" onclick="doCloudflareLogout()">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          Cerrar sesión
+          Salir de la sesión
         </button>
       </div>
     </aside>
 
-    <!-- MAIN -->
     <main class="main">
 
-      <!-- DASHBOARD -->
       <div id="tab-dashboard">
         <div class="page-header">
           <div><h1 class="page-title">Dashboard</h1><p class="page-sub" id="dash-sub">—</p></div>
@@ -292,7 +268,6 @@ tbody td{padding:12px 14px;font-size:.82rem;color:var(--texto-medio);vertical-al
         </div>
       </div>
 
-      <!-- LEADS -->
       <div id="tab-leads" style="display:none;">
         <div class="page-header">
           <div><h1 class="page-title">Leads</h1><p class="page-sub">Todos los formularios completados</p></div>
@@ -320,7 +295,6 @@ tbody td{padding:12px 14px;font-size:.82rem;color:var(--texto-medio);vertical-al
         </div>
       </div>
 
-      <!-- ESTADÍSTICAS -->
       <div id="tab-estadisticas" style="display:none;">
         <div class="page-header"><div><h1 class="page-title">Estadísticas</h1><p class="page-sub">Distribución de respuestas</p></div></div>
         <div class="charts-row" style="grid-template-columns:1fr 1fr 1fr">
@@ -338,19 +312,17 @@ tbody td{padding:12px 14px;font-size:.82rem;color:var(--texto-medio);vertical-al
         </div>
       </div>
 
-      <!-- USUARIOS -->
       <div id="tab-usuarios" style="display:none;">
         <div class="page-header">
-          <div><h1 class="page-title">Gestión de usuarios</h1><p class="page-sub">Altas, bajas y permisos del equipo</p></div>
+          <div><h1 class="page-title">Gestión de usuarios</h1><p class="page-sub">Altas, bajas y asignación de roles de acceso</p></div>
           <button class="tbtn primary" id="btn-new-user" onclick="openUserModal()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Nuevo usuario
+            Nuevo usuario corporativo
           </button>
         </div>
         <div id="users-grid" class="users-grid"></div>
       </div>
 
-      <!-- ACTIVIDAD -->
       <div id="tab-actividad" style="display:none;">
         <div class="page-header"><div><h1 class="page-title">Registro de actividad</h1><p class="page-sub">Últimas acciones en el panel</p></div>
         <button class="tbtn danger" onclick="clearActivity()">Limpiar registro</button></div>
@@ -361,7 +333,6 @@ tbody td{padding:12px 14px;font-size:.82rem;color:var(--texto-medio);vertical-al
   </div>
 </div>
 
-<!-- MODAL LEAD DETALLE -->
 <div class="modal-overlay" id="modal-lead">
   <div class="modal-box md">
     <div class="mhead"><div class="mtitle" id="ml-title">—</div><button class="mclose" onclick="closeModal('modal-lead')">✕</button></div>
@@ -369,7 +340,6 @@ tbody td{padding:12px 14px;font-size:.82rem;color:var(--texto-medio);vertical-al
   </div>
 </div>
 
-<!-- MODAL USUARIO (crear/editar) -->
 <div class="modal-overlay" id="modal-user">
   <div class="modal-box sm">
     <div class="mhead"><div class="mtitle" id="mu-title">Nuevo usuario</div><button class="mclose" onclick="closeModal('modal-user')">✕</button></div>
@@ -381,27 +351,20 @@ tbody td{padding:12px 14px;font-size:.82rem;color:var(--texto-medio);vertical-al
           <input type="text" id="mu-name" class="form-input" placeholder="Ej: Carlos López">
         </div>
         <div class="form-group">
-          <label class="form-label">Usuario (login)</label>
-          <input type="text" id="mu-username" class="form-input" placeholder="carlos.lopez" autocomplete="off">
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Contraseña</label>
-          <input type="text" id="mu-pwd" class="form-input" placeholder="Mín. 6 caracteres" autocomplete="off">
-          <p class="form-hint" id="mu-pwd-hint">Dejar vacío para no cambiar</p>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Rol</label>
-          <select id="mu-rol" class="form-select" onchange="updatePermsByRole()">
-            <option value="admin">Administrador</option>
-            <option value="viewer">Solo lectura</option>
-            <option value="manager">Gestor de leads</option>
-          </select>
+          <label class="form-label">Email de Cloudflare Access</label>
+          <input type="email" id="mu-username" class="form-input" placeholder="carlos@tuempresa.com" autocomplete="off">
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">Permisos específicos</label>
+        <label class="form-label">Rol del Sistema</label>
+        <select id="mu-rol" class="form-select" onchange="updatePermsByRole()">
+          <option value="admin">Administrador</option>
+          <option value="viewer">Solo lectura</option>
+          <option value="manager">Gestor de leads</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Permisos específicos asignados</label>
         <div class="perms-grid" id="perms-grid">
           <label class="perm-check" id="pc-dashboard"><input type="checkbox" id="p-dashboard" value="dashboard"><span>📊 Ver dashboard</span></label>
           <label class="perm-check" id="pc-leads"><input type="checkbox" id="p-leads" value="leads"><span>👥 Ver leads</span></label>
@@ -426,72 +389,11 @@ tbody td{padding:12px 14px;font-size:.82rem;color:var(--texto-medio);vertical-al
   </div>
 </div>
 
-<!-- MODAL CAMBIAR CONTRASEÑA -->
-<div class="modal-overlay" id="modal-pwd">
-  <div class="modal-box sm">
-    <div class="mhead"><div class="mtitle">Cambiar contraseña</div><button class="mclose" onclick="closeModal('modal-pwd')">✕</button></div>
-    <div class="mbody">
-      <div class="form-group"><label class="form-label">Contraseña actual</label><input type="password" id="pwd-old" class="form-input" placeholder="••••••••" autocomplete="current-password"></div>
-      <div class="form-group"><label class="form-label">Nueva contraseña</label><input type="password" id="pwd-new" class="form-input" placeholder="Mín. 6 caracteres" autocomplete="new-password"></div>
-      <div class="form-group"><label class="form-label">Confirmar nueva contraseña</label><input type="password" id="pwd-confirm" class="form-input" placeholder="Repite la nueva contraseña" autocomplete="new-password"></div>
-      <p id="pwd-err" class="form-err">—</p>
-      <p id="pwd-ok" style="display:none;color:var(--verde);font-size:.8rem;margin-top:6px;font-weight:600;">✅ Contraseña cambiada correctamente.</p>
-    </div>
-    <div class="mfooter">
-      <button class="tbtn" onclick="closeModal('modal-pwd')">Cancelar</button>
-      <button class="tbtn primary" onclick="changePassword()">Guardar contraseña</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL RESETEAR CONTRASEÑA (owner resetea a otro usuario) -->
-<div class="modal-overlay" id="modal-reset-pwd">
-  <div class="modal-box sm">
-    <div class="mhead"><div class="mtitle">Resetear contraseña</div><button class="mclose" onclick="closeModal('modal-reset-pwd')">✕</button></div>
-    <div class="mbody">
-      <p style="font-size:.88rem;color:var(--texto-medio);margin-bottom:20px;line-height:1.6;">Establece una contraseña nueva para <strong id="reset-user-name">este usuario</strong>. Se la tendrás que comunicar tú directamente.</p>
-      <div class="form-group"><label class="form-label">Nueva contraseña</label><input type="password" id="reset-pwd-new" class="form-input" placeholder="Mín. 6 caracteres" autocomplete="new-password"></div>
-      <div class="form-group"><label class="form-label">Confirmar contraseña</label><input type="password" id="reset-pwd-confirm" class="form-input" placeholder="Repite la contraseña" autocomplete="new-password"></div>
-      <p id="reset-pwd-err" class="form-err">—</p>
-      <p id="reset-pwd-ok" style="display:none;color:var(--verde);font-size:.8rem;margin-top:6px;font-weight:600;">✅ Contraseña actualizada correctamente.</p>
-    </div>
-    <div class="mfooter">
-      <button class="tbtn" onclick="closeModal('modal-reset-pwd')">Cancelar</button>
-      <button class="tbtn primary" onclick="resetPassword()">Establecer contraseña</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL OLVIDÉ MI CONTRASEÑA (pantalla de login) -->
-<div class="modal-overlay" id="modal-forgot">
-  <div class="modal-box sm">
-    <div class="mhead"><div class="mtitle">¿Olvidaste tu contraseña?</div><button class="mclose" onclick="closeModal('modal-forgot')">✕</button></div>
-    <div class="mbody">
-      <p style="font-size:.88rem;color:var(--texto-medio);margin-bottom:20px;line-height:1.65;">Si eres el <strong>propietario</strong>, introduce tu usuario y la contraseña de emergencia para acceder y restablecerla desde el panel.<br><br>Si eres un miembro del equipo, contacta con el propietario para que te resetee la contraseña.</p>
-      <div class="form-group">
-        <label class="form-label">Usuario</label>
-        <input type="text" id="forgot-user" class="form-input" placeholder="tu-usuario" autocomplete="username">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Contraseña de emergencia</label>
-        <input type="password" id="forgot-emergency" class="form-input" placeholder="••••••••" autocomplete="current-password">
-        <p class="form-hint" style="margin-top:6px">La contraseña de emergencia es: <strong id="emergency-hint" style="color:var(--naranja)">—</strong></p>
-      </div>
-      <p id="forgot-err" class="form-err">—</p>
-    </div>
-    <div class="mfooter">
-      <button class="tbtn" onclick="closeModal('modal-forgot')">Cancelar</button>
-      <button class="tbtn primary" onclick="doForgotLogin()">Acceder →</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL CONFIRMAR ELIMINAR USUARIO -->
 <div class="modal-overlay" id="modal-del-user">
   <div class="modal-box sm">
     <div class="mhead"><div class="mtitle">Eliminar usuario</div><button class="mclose" onclick="closeModal('modal-del-user')">✕</button></div>
     <div class="mbody">
-      <div class="danger-box"><p>¿Estás seguro de que quieres eliminar a <strong id="del-user-name">este usuario</strong>? Esta acción no se puede deshacer.</p></div>
+      <div class="danger-box"><p>¿Estás seguro de que quieres revocar el acceso a <strong id="del-user-name">este usuario</strong>? Perderá el acceso de forma inmediata.</p></div>
     </div>
     <div class="mfooter">
       <button class="tbtn" onclick="closeModal('modal-del-user')">Cancelar</button>
@@ -507,7 +409,6 @@ tbody td{padding:12px 14px;font-size:.82rem;color:var(--texto-medio);vertical-al
 const SK_RESPONSES = 'fi_responses';
 const SK_USERS     = 'fi_users';
 const SK_ACTIVITY  = 'fi_activity';
-const SK_SESSION   = 'fi_session';
 
 // ════════════════════════════════════════════
 // USUARIOS — SISTEMA
@@ -515,13 +416,16 @@ const SK_SESSION   = 'fi_session';
 function getUsers() { try { return JSON.parse(localStorage.getItem(SK_USERS) || '[]'); } catch { return []; } }
 function saveUsers(u) { localStorage.setItem(SK_USERS, JSON.stringify(u)); }
 
-// Crear owner por defecto si no existe
+// Inicializar base de usuarios usando los emails autorizados en Cloudflare Access
 (function initUsers() {
   const users = getUsers();
+  // El propietario histórico ahora se valida mediante el correo directo
   if (!users.find(u => u.role === 'owner')) {
     users.push({
-      id: 'owner-1', name: 'Propietario', username: 'admin',
-      password: 'FreedomAdmin2025', role: 'owner',
+      id: 'owner-1', 
+      name: 'Propietario', 
+      username: 'jjavierzhun@gmail.com', // Cambiado a tu email para sincronizar el perfil automáticamente
+      role: 'owner',
       permissions: ['dashboard','leads','delete_leads','export','stats','users'],
       active: true, created: new Date().toISOString(), lastLogin: null
     });
@@ -530,62 +434,66 @@ function saveUsers(u) { localStorage.setItem(SK_USERS, JSON.stringify(u)); }
 })();
 
 // ════════════════════════════════════════════
-// SESSION
+// DISPARADOR AUTO-LOGIN DESDE CLOUDFLARE
 // ════════════════════════════════════════════
 let currentUser = null;
 
-function getSession() {
-  try { return JSON.parse(sessionStorage.getItem(SK_SESSION)); } catch { return null; }
-}
-function setSession(user) {
-  sessionStorage.setItem(SK_SESSION, JSON.stringify({ id: user.id }));
-}
+window.addEventListener('load', async () => {
+  let detectedEmail = "jjavierzhun@gmail.com"; // Fallback por defecto si se ejecuta en local
 
-// ════════════════════════════════════════════
-// LOGIN / LOGOUT
-// ════════════════════════════════════════════
-function doLogin() {
-  const uname = document.getElementById('li-user').value.trim();
-  const pwd   = document.getElementById('li-pwd').value;
+  try {
+    // Le pedimos al endpoint de identidad de Cloudflare Access quién está logueado en este navegador
+    const res = await fetch('/cdn-cgi/access/identity');
+    if (res.ok) {
+      const identity = await res.json();
+      if (identity && identity.email) {
+        detectedEmail = identity.email.toLowerCase().trim();
+      }
+    }
+  } catch (e) {
+    console.log("No se pudo conectar a /cdn-cgi/access/identity (Probablemente entorno local o worker directo). Usando fallback local.");
+  }
+
   const users = getUsers();
-  const user  = users.find(u => u.username === uname && u.password === pwd && u.active !== false);
-  if (!user) { document.getElementById('login-err').style.display = 'block'; return; }
-  // Update lastLogin
+  let user = users.find(u => u.username.toLowerCase().trim() === detectedEmail && u.active !== false);
+
+  // Si el usuario existe en las políticas de Cloudflare pero no en nuestra lista local, le damos un rol "viewer" automático
+  if (!user) {
+    user = {
+      id: 'u-' + Date.now(),
+      name: detectedEmail.split('@')[0],
+      username: detectedEmail,
+      role: 'viewer',
+      permissions: ['dashboard', 'leads', 'stats'],
+      active: true,
+      created: new Date().toISOString(),
+      lastLogin: new Date().toISOString()
+    };
+    users.push(user);
+    saveUsers(users);
+  }
+
   user.lastLogin = new Date().toISOString();
   saveUsers(users);
+  
   currentUser = user;
-  setSession(user);
-  logActivity('login', `Inicio de sesión: ${user.name}`, user.id);
+  logActivity('login', `Acceso autenticado via Cloudflare: ${user.name}`, user.id);
+  
+  // Ocultamos pantalla de carga y mostramos el dashboard directo
+  document.getElementById('loading-screen').style.display = 'none';
   bootAdmin(user);
-}
-
-function doLogout() {
-  logActivity('logout', `Cierre de sesión: ${currentUser?.name}`, currentUser?.id);
-  sessionStorage.removeItem(SK_SESSION);
-  currentUser = null;
-  document.getElementById('admin-screen').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('li-user').value = '';
-  document.getElementById('li-pwd').value = '';
-  document.getElementById('login-err').style.display = 'none';
-}
-
-document.getElementById('li-pwd').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
-
-// Auto-login si hay sesión activa
-window.addEventListener('load', () => {
-  const sess = getSession();
-  if (sess) {
-    const user = getUsers().find(u => u.id === sess.id && u.active !== false);
-    if (user) { currentUser = user; bootAdmin(user); }
-  }
 });
+
+function doCloudflareLogout() {
+  logActivity('logout', `Cierre de sesión panel: ${currentUser?.name}`, currentUser?.id);
+  // Redirigir al deslogueo nativo de cookies de Cloudflare Access
+  window.location.href = '/cdn-cgi/access/logout';
+}
 
 // ════════════════════════════════════════════
 // BOOT ADMIN
 // ════════════════════════════════════════════
 function bootAdmin(user) {
-  document.getElementById('login-screen').style.display = 'none';
   document.getElementById('admin-screen').style.display = 'block';
 
   // Sidebar user info
@@ -617,7 +525,6 @@ function applyNavPermissions(user) {
   }
 
   // Botones de acción en leads
-  const isOwnerOrAdmin = isOwner || user.role === 'admin' || user.role === 'manager';
   document.getElementById('leads-acts').innerHTML = `
     ${has('export') ? '<button class="tbtn" onclick="exportCSV()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Exportar CSV</button>' : ''}
     ${(isOwner || has('delete_leads')) ? '<button class="tbtn danger" onclick="clearAll()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>Borrar todo</button>' : ''}`;
@@ -634,7 +541,6 @@ function showTab(name) {
   });
   if(name==='usuarios') { renderUsers(); return; }
   if(name==='actividad') { renderActivity(); return; }
-  // Para tabs de datos: recargar desde API primero
   if(['dashboard','leads','estadisticas'].includes(name)) {
     cargarDatos().then(() => {
       if(name==='dashboard') { populateSectorFilter(); renderDashboard(); }
@@ -648,10 +554,8 @@ function showTab(name) {
 // DATA — API CLOUDFLARE + localStorage fallback
 // ════════════════════════════════════════════
 const API_URL = 'https://freedom-api.joselc1974.workers.dev';
-let _cachedData = null;   // cache en memoria
-let _loadingData = false;
+let _cachedData = null;
 
-// Normaliza un registro de la API al mismo formato que localStorage
 function normalizeRecord(r, idx) {
   return {
     id:          r.id        || r.timestamp || (Date.now() + idx),
@@ -669,7 +573,6 @@ function normalizeRecord(r, idx) {
   };
 }
 
-// Carga datos desde la API, con fallback a localStorage
 async function cargarDatos() {
   setSyncStatus('loading');
   try {
@@ -678,26 +581,21 @@ async function cargarDatos() {
     const raw = await res.json();
     const lista = Array.isArray(raw) ? raw : (raw.data || raw.results || []);
     _cachedData = lista.map((r, i) => normalizeRecord(r, i));
-    // Sincronizar también a localStorage como backup
     localStorage.setItem(SK_RESPONSES, JSON.stringify(_cachedData));
     setSyncStatus('ok', _cachedData.length + ' leads cargados desde servidor');
-    console.log('✅ Datos cargados desde API:', _cachedData.length);
     return _cachedData;
   } catch(err) {
-    console.warn('⚠️ API no disponible, usando localStorage:', err.message);
     setSyncStatus('warn', 'Sin conexión con el servidor — mostrando datos locales');
     _cachedData = JSON.parse(localStorage.getItem(SK_RESPONSES) || '[]');
     return _cachedData;
   }
 }
 
-// getData() síncrono — devuelve cache, o localStorage si aún no cargó
 function getData() {
   if (_cachedData !== null) return _cachedData;
   try { return JSON.parse(localStorage.getItem(SK_RESPONSES) || '[]'); } catch { return []; }
 }
 
-// Indicador de sync en el sidebar
 function setSyncStatus(state, msg) {
   const el = document.getElementById('sync-status');
   if (!el) return;
@@ -749,7 +647,7 @@ function populateSectorFilter() {
   const data = getData();
   const sectors = [...new Set(data.map(d=>d.sector).filter(Boolean))];
   const sel = document.getElementById('f-sector');
-  sel.innerHTML = '<option value="">Todos</option>' + sectors.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('');
+  if(sel) sel.innerHTML = '<option value="">Todos</option>' + sectors.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('');
 }
 function renderLeads() {
   let data = getData();
@@ -844,7 +742,7 @@ function countField(data,f){return data.reduce((a,d)=>{const v=d[f];if(v)a[v]=(a
 function renderBarChart(id,map,color){
   const el=document.getElementById(id);
   const e=Object.entries(map).sort((a,b)=>b[1]-a[1]);const max=e.length?e[0][1]:1;
-  el.innerHTML=e.length?e.map(([l,c])=>`<div class="bar-row"><div class="bar-lbl" title="${esc(l)}">${esc(short(l,18))}</div><div class="bar-track"><div class="bar-fill ${color}" style="width:${Math.round(c/max*100)}%"></div></div><div class="bar-cnt">${c}</div></div>`).join(''):'<p style="color:var(--texto-suave);font-size:.82rem">Sin datos.</p>';
+  if(el) el.innerHTML=e.length?e.map(([l,c])=>`<div class="bar-row"><div class="bar-lbl" title="${esc(l)}">${esc(short(l,18))}</div><div class="bar-track"><div class="bar-fill ${color}" style="width:${Math.round(c/max*100)}%"></div></div><div class="bar-cnt">${c}</div></div>`).join(''):'<p style="color:var(--texto-suave);font-size:.82rem">Sin datos.</p>';
 }
 
 // ════════════════════════════════════════════
@@ -874,17 +772,15 @@ function renderUsers() {
         <div class="uc-avatar" style="background:${avatarColor(u.name)}">${u.name.charAt(0)}</div>
         <div class="uc-info">
           <div class="uc-name">${esc(u.name)}</div>
-          <div class="uc-username">@${esc(u.username)}</div>
+          <div class="uc-username" style="font-size:0.7rem; color:var(--naranja)">${esc(u.username)}</div>
         </div>
         <div class="uc-actions">
           ${canEdit?`<button class="uc-btn" onclick="openUserModal('${u.id}')" title="Editar">✏️</button>`:''}
-          ${u.id===currentUser?.id?`<button class="uc-btn" onclick="openChangePwd()" title="Cambiar contraseña">🔑</button>`:''}
-          ${(isOwner && u.role!=='owner')?`<button class="uc-btn" onclick="openResetPwd('${u.id}','${esc(u.name)}')" title="Resetear contraseña">🔐</button>`:''}
           ${canDel?`<button class="uc-btn del" onclick="askDeleteUser('${u.id}','${esc(u.name)}')" title="Eliminar">🗑️</button>`:''}
         </div>
       </div>
       <div style="margin-bottom:10px;display:flex;align-items:center;gap:8px">
-        <span class="badge ub-${u.role}">${roleLabel(u.role)}</span>
+        <span class="badge cb-${u.role} ub-${u.role}">${roleLabel(u.role)}</span>
         <span style="display:flex;align-items:center;font-size:.72rem;color:var(--texto-suave)"><span class="status-dot ${u.active!==false?'dot-active':'dot-inactive'}"></span>${u.active!==false?'Activo':'Inactivo'}</span>
       </div>
       <div class="uc-perms">
@@ -907,8 +803,7 @@ let editingUserId = null;
 function openUserModal(userId) {
   editingUserId = userId || null;
   const isEdit = !!userId;
-  document.getElementById('mu-title').textContent = isEdit ? 'Editar usuario' : 'Nuevo usuario';
-  document.getElementById('mu-pwd-hint').textContent = isEdit ? 'Dejar vacío para no cambiar' : '';
+  document.getElementById('mu-title').textContent = isEdit ? 'Editar usuario' : 'Nuevo usuario corporativo';
   document.getElementById('mu-err').style.display = 'none';
 
   if (isEdit) {
@@ -916,7 +811,6 @@ function openUserModal(userId) {
     document.getElementById('mu-id').value = u.id;
     document.getElementById('mu-name').value = u.name;
     document.getElementById('mu-username').value = u.username;
-    document.getElementById('mu-pwd').value = '';
     document.getElementById('mu-rol').value = u.role;
     document.getElementById('mu-active').checked = u.active !== false;
     const perms = u.permissions || [];
@@ -928,7 +822,6 @@ function openUserModal(userId) {
     document.getElementById('mu-id').value = '';
     document.getElementById('mu-name').value = '';
     document.getElementById('mu-username').value = '';
-    document.getElementById('mu-pwd').value = '';
     document.getElementById('mu-rol').value = 'viewer';
     document.getElementById('mu-active').checked = true;
     updatePermsByRole();
@@ -946,7 +839,6 @@ function updatePermsByRole() {
   });
 }
 
-// Sync visual on checkbox click
 document.querySelectorAll('.perm-check input').forEach(cb => {
   cb.addEventListener('change', function() {
     this.closest('.perm-check').classList.toggle('checked', this.checked);
@@ -956,32 +848,28 @@ document.querySelectorAll('.perm-check input').forEach(cb => {
 function saveUser() {
   const name     = document.getElementById('mu-name').value.trim();
   const username = document.getElementById('mu-username').value.trim().toLowerCase();
-  const pwd      = document.getElementById('mu-pwd').value;
   const role     = document.getElementById('mu-rol').value;
   const active   = document.getElementById('mu-active').checked;
   const err      = document.getElementById('mu-err');
 
-  if(!name || !username) { err.textContent='Nombre y usuario son obligatorios.'; err.style.display='block'; return; }
-  if(!editingUserId && !pwd) { err.textContent='La contraseña es obligatoria para usuarios nuevos.'; err.style.display='block'; return; }
-  if(pwd && pwd.length < 6) { err.textContent='La contraseña debe tener al menos 6 caracteres.'; err.style.display='block'; return; }
+  if(!name || !username) { err.textContent='Nombre y Email son obligatorios.'; err.style.display='block'; return; }
 
   const perms = ['dashboard','leads','delete_leads','export','stats','users'].filter(p => document.getElementById('p-'+p).checked);
   const users = getUsers();
   const dupCheck = users.find(u => u.username === username && u.id !== editingUserId);
-  if(dupCheck) { err.textContent='Ese nombre de usuario ya existe.'; err.style.display='block'; return; }
+  if(dupCheck) { err.textContent='Este correo ya está registrado.'; err.style.display='block'; return; }
 
   if(editingUserId) {
     const idx = users.findIndex(u=>u.id===editingUserId);
     if(idx===-1) return;
     users[idx].name = name;
     users[idx].username = username;
-    if(pwd) users[idx].password = pwd;
     users[idx].role = role;
     users[idx].active = active;
     users[idx].permissions = perms;
     logActivity('edit_user', `Usuario editado: ${name}`, currentUser?.id);
   } else {
-    users.push({ id:'u-'+Date.now(), name, username, password:pwd, role, permissions:perms, active, created:new Date().toISOString(), lastLogin:null });
+    users.push({ id:'u-'+Date.now(), name, username, role, permissions:perms, active, created:new Date().toISOString(), lastLogin:null });
     logActivity('create_user', `Usuario creado: ${name}`, currentUser?.id);
   }
 
@@ -1000,96 +888,12 @@ function askDeleteUser(id, name) {
 function confirmDeleteUser() {
   if(!deletingUserId) return;
   const users = getUsers().filter(u=>u.id!==deletingUserId);
-  logActivity('delete_user', `Usuario eliminado (id: ${deletingUserId})`, currentUser?.id);
+  logActivity('delete_user', `Acceso revocado (id: ${deletingUserId})`, currentUser?.id);
   saveUsers(users);
   deletingUserId = null;
   closeModal('modal-del-user');
   renderUsers();
   renderDashboard();
-}
-
-// Abrir modal cambiar contraseña propia (limpia campos)
-function openChangePwd() {
-  ['pwd-old','pwd-new','pwd-confirm'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('pwd-err').style.display = 'none';
-  document.getElementById('pwd-ok').style.display = 'none';
-  openModal('modal-pwd');
-}
-
-// Cambiar contraseña propia
-function changePassword() {
-  const oldPwd  = document.getElementById('pwd-old').value;
-  const newPwd  = document.getElementById('pwd-new').value;
-  const confPwd = document.getElementById('pwd-confirm').value;
-  const err = document.getElementById('pwd-err');
-  const ok  = document.getElementById('pwd-ok');
-  err.style.display = 'none'; ok.style.display = 'none';
-  const users = getUsers();
-  const u = users.find(u => u.id === currentUser.id);
-  if (!u || u.password !== oldPwd) { err.textContent = 'La contraseña actual no es correcta.'; err.style.display = 'block'; return; }
-  if (newPwd.length < 6) { err.textContent = 'La nueva contraseña debe tener al menos 6 caracteres.'; err.style.display = 'block'; return; }
-  if (newPwd !== confPwd) { err.textContent = 'Las contraseñas no coinciden.'; err.style.display = 'block'; return; }
-  u.password = newPwd;
-  saveUsers(users);
-  currentUser.password = newPwd;
-  logActivity('change_pwd', 'Contraseña propia cambiada', currentUser.id);
-  ok.style.display = 'block';
-  setTimeout(() => closeModal('modal-pwd'), 1400);
-}
-
-// Resetear contraseña de otro usuario (solo owner)
-let resetTargetId = null;
-function openResetPwd(userId, userName) {
-  resetTargetId = userId;
-  document.getElementById('reset-user-name').textContent = userName;
-  ['reset-pwd-new','reset-pwd-confirm'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('reset-pwd-err').style.display = 'none';
-  document.getElementById('reset-pwd-ok').style.display = 'none';
-  openModal('modal-reset-pwd');
-}
-function resetPassword() {
-  const newPwd  = document.getElementById('reset-pwd-new').value;
-  const confPwd = document.getElementById('reset-pwd-confirm').value;
-  const err = document.getElementById('reset-pwd-err');
-  const ok  = document.getElementById('reset-pwd-ok');
-  err.style.display = 'none'; ok.style.display = 'none';
-  if (newPwd.length < 6) { err.textContent = 'La contraseña debe tener al menos 6 caracteres.'; err.style.display = 'block'; return; }
-  if (newPwd !== confPwd) { err.textContent = 'Las contraseñas no coinciden.'; err.style.display = 'block'; return; }
-  const users = getUsers();
-  const u = users.find(u => u.id === resetTargetId);
-  if (!u) return;
-  u.password = newPwd;
-  saveUsers(users);
-  logActivity('reset_pwd', `Contraseña reseteada para: ${u.name}`, currentUser.id);
-  ok.style.display = 'block';
-  setTimeout(() => closeModal('modal-reset-pwd'), 1400);
-}
-
-// Olvidé mi contraseña — acceso de emergencia
-const EMERGENCY_PWD = 'FI-Emergency-2025';
-function openForgot() {
-  document.getElementById('forgot-user').value = '';
-  document.getElementById('forgot-emergency').value = '';
-  document.getElementById('forgot-err').style.display = 'none';
-  document.getElementById('emergency-hint').textContent = EMERGENCY_PWD;
-  openModal('modal-forgot');
-}
-function doForgotLogin() {
-  const uname = document.getElementById('forgot-user').value.trim();
-  const emPwd = document.getElementById('forgot-emergency').value;
-  const err   = document.getElementById('forgot-err');
-  err.style.display = 'none';
-  if (emPwd !== EMERGENCY_PWD) { err.textContent = 'Contraseña de emergencia incorrecta.'; err.style.display = 'block'; return; }
-  const users  = getUsers();
-  const owner  = users.find(u => u.username === uname && u.role === 'owner');
-  if (!owner) { err.textContent = 'Solo el propietario puede usar la contraseña de emergencia.'; err.style.display = 'block'; return; }
-  owner.lastLogin = new Date().toISOString();
-  saveUsers(users);
-  currentUser = owner;
-  setSession(owner);
-  logActivity('emergency_login', `Acceso de emergencia: ${owner.name}`, owner.id);
-  closeModal('modal-forgot');
-  bootAdmin(owner);
 }
 
 // ════════════════════════════════════════════
@@ -1102,11 +906,11 @@ function logActivity(type, text, userId) {
   log.unshift({ type, text, user: user?.name||'Sistema', date: new Date().toISOString() });
   localStorage.setItem(SK_ACTIVITY, JSON.stringify(log.slice(0,200)));
 }
-const ACT_ICONS = { login:'🟢', logout:'🔴', create_user:'👤', edit_user:'✏️', delete_user:'🗑️', delete_lead:'🗑️', clear_leads:'⚠️', export:'📥', change_pwd:'🔑' };
+const ACT_ICONS = { login:'🟢', logout:'🔴', create_user:'👤', edit_user:'✏️', delete_user:'🗑️', delete_lead:'🗑️', clear_leads:'⚠️', export:'📥' };
 function renderActivity() {
   const logs = getActivity();
   const list = document.getElementById('act-list');
-  list.innerHTML = logs.length ? logs.map(l=>`
+  if(list) list.innerHTML = logs.length ? logs.map(l=>`
     <div class="act-item">
       <div class="act-icon" style="background:var(--gris-fondo)">${ACT_ICONS[l.type]||'•'}</div>
       <div class="act-body"><div class="act-text">${esc(l.text)} <span style="color:var(--texto-suave);font-weight:400">— ${esc(l.user)}</span></div><div class="act-time">${fmtDate(l.date)}</div></div>
