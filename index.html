@@ -876,18 +876,27 @@ function closeModal() {
 
 // Cerrar modal SOLO con la X — no al hacer click fuera
 
-// Detectar confirmación de reserva de Builderall — múltiples métodos
+// Detectar confirmación de reserva de Builderall y extraer datos
 window.addEventListener('message', function(e) {
   if (!e.data) return;
   try {
     const data = typeof e.data === 'object' ? e.data : JSON.parse(e.data);
-    const confirmKeys = ['booking_confirmed','appointment_confirmed','confirmed','success','scheduled','booked'];
     const str = JSON.stringify(data).toLowerCase();
-    if (confirmKeys.some(k => str.includes(k))) {
+    
+    // Si el mensaje contiene indicios de éxito
+    if (['booking_confirmed','appointment_confirmed','confirmed','success','scheduled','booked'].some(k => str.includes(k))) {
+      
+      // Intentamos extraer el email o nombre si Builderall lo viaja en el objeto
+      if (data.email || data.userEmail || data.customer_email) {
+        localStorage.setItem('lead_email', data.email || data.userEmail || data.customer_email);
+      }
+      if (data.name || data.userName || data.customer_name) {
+        localStorage.setItem('lead_name', data.name || data.userName || data.customer_name);
+      }
+      
       redirigirPostBooking();
     }
-  } catch(e) {
-    // e.data era string plano
+  } catch(err) {
     const str = String(e.data).toLowerCase();
     if (str.includes('confirm') || str.includes('success') || str.includes('booked') || str.includes('scheduled')) {
       redirigirPostBooking();
